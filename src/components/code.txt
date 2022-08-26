@@ -1,0 +1,517 @@
+//SPDX-License-Identifier: Apache 2.0
+pragma solidity ^0.8.13;
+
+contract LandBlock {
+
+    // External variables
+    address public _skybreachSC;
+    address public _userDataSC;
+    address public _xcRmrkTokenSC;
+    uint256 public _tokenDecimals = 1*10**10;
+    // Internal variables for services
+    uint256 private NOT_IN_ANY_OFFER = 0;
+    uint256 public _serviceFee; 
+    uint256 public _creationOfferFeeMandatory;  // 0 = no fee for creating offer, 1 yes
+    uint256 private _minOfferPrice;
+    uint256 private _offerCreationFee;
+    uint256 private _minLandsPerOffer;
+    uint256 public _isLocked; // 1 = contract locked, 0 otherwise
+    uint256 public _lastOfferId;
+    uint256[] private _activeOfferIds;
+    mapping (address => uint256[]) private _user_offerIds;
+    mapping (uint256 => uint256) private _landId_offerId;
+    mapping (uint256 => LandBlockOffer) private _offerId_offer;
+    mapping (uint256 => address) private _landId_declaredDepositorAddress;
+    mapping (uint256 => address) private _landId_confirmedDepositorAddress;
+    mapping (address => uint256[]) private _user_depositedLands;
+
+    address private _thirdPartBeneficiary;
+    uint256 private _thirdPartPercentage;
+    address public _smartContractOwner;
+    mapping(address => uint256) private _user_admin; // 1 = user is admin, other values = no
+    mapping(address => uint256) public _user_depositedTokens;
+
+    // Block offer
+    struct LandBlockOffer{
+        uint256 offerId;
+        uint256 price;
+        address offerMaker;
+        uint256[] landIds;
+        uint256 serviceFee;
+        uint256 timestamp;
+    }
+
+    // Constructor
+    constructor () {
+        _smartContractOwner = msg.sender;
+        _serviceFee = 25;
+        _lastOfferId = 0;
+        _creationOfferFeeMandatory = 0;
+        _minOfferPrice = 1 * _tokenDecimals; // 1 xcRMRK 
+        _skybreachSC = 0x9C4A4dFeC5A32cDCAeDBA369a7a8672083A2844A;
+        _userDataSC = 0x9E29384B754C0d2Fe3F26F2D9B14041BF6c33641;
+        _xcRmrkTokenSC = 0x3Ff3B0361B450E70729006918c14DEb6Da410349;
+        _offerCreationFee = 5 * 10**9; // 0,5 xcRMRK
+        _isLocked = 1;
+        _minLandsPerOffer = 1;
+        _thirdPartBeneficiary = address(this);
+        _thirdPartPercentage = 0;
+    }
+
+    // Events
+    event OfferCreated(uint256 indexed _id, address indexed _maker, uint256 _price);
+    event OfferCancelled(uint256 indexed _id, uint256[] plotIds);
+    event LandDepositConfirmed(uint256 indexed _landId, address _depositor);
+    event LandWithdrawn(uint256 _plotId);
+    event LandBlockBought(uint256 indexed _blockId, uint256[] plotIds);
+    event LandBoughtWithdrawn(uint256 _plotId);
+
+    // Modifiers
+    modifier onlyOwner {
+        require(msg.sender == _smartContractOwner, "User is not owner.");
+        _;
+    }
+
+    modifier onlyOwnerOrAdmin {
+        require(msg.sender == _smartContractOwner || isAdmin(msg.sender), "User is not owner or admin.");
+        _;
+    }
+
+    modifier contractActive {
+        require(_isLocked == 0, "Can't create offer now - Contract not active");
+        _;
+    }
+
+    // Handle admins
+
+    function addAdmin(address admin) external onlyOwner {
+        require(admin != address(0), "Admin cannot be the zero address");
+        _user_admin[admin] = 1;
+    }
+
+    function revokeAdmin(address admin) external onlyOwner {
+        _user_admin[admin] = 0;
+    }
+
+    function isAdmin(address admin) public view returns (bool) {
+        return _user_admin[admin] == 1;
+    }
+
+    // Handle connection to external SC
+    function setSkybreachContractAddress(address newSkybreachAddress) public onlyOwnerOrAdmin {
+        _skybreachSC = newSkybreachAddress;
+    }
+
+    function setXcRmrkTokenContractAddress(address newXcRmrkContractAddress) public onlyOwnerOrAdmin {
+        _xcRmrkTokenSC = newXcRmrkContractAddress;
+    }
+
+    function setUserDataContractAddress(address newUserDataContractAddress) public onlyOwnerOrAdmin {
+        _userDataSC = newUserDataContractAddress;
+    }
+
+    function setContractActive() external onlyOwnerOrAdmin {
+        _isLocked = 0;
+    }
+
+    function setContractNotActive() external onlyOwnerOrAdmin {
+        _isLocked = 1;
+    }
+
+    function setCreationOfferFeeMandatory() external onlyOwnerOrAdmin {
+        _creationOfferFeeMandatory = 1;
+    }
+
+    function setCreationOfferFeeNotMandatory() external onlyOwnerOrAdmin {
+        _creationOfferFeeMandatory = 0;
+    }
+
+    function setFees(uint256 serviceFee, uint256 thirdPartFee) external onlyOwnerOrAdmin {
+        require(serviceFee + thirdPartFee <= 100, "Service fee + third part fee should be less than or equal to 10% of the cost");
+        _serviceFee = serviceFee;
+        _thirdPartPercentage = thirdPartFee;
+    }
+
+    function setThirdPartBeneficiary(address thirdPart) external onlyOwner {
+        _thirdPartBeneficiary = thirdPart;
+    }
+
+    // Handle offers
+
+    function declareLandDeposit(uint256 plotId) public contractActive {
+        // Tracking land owner
+        address plotOwner = ISkybreachLandSale(_skybreachSC).getPlotOwner(plotId);
+        require(plotOwner == msg.sender, "Land not owned"); 
+        _landId_declaredDepositorAddress[plotId] = msg.sender;
+    }
+
+    function declareBatchLandDeposit(uint256[] calldata plotIds) external contractActive {
+        for (uint256 i=0; i<plotIds.length; i++) {
+            declareLandDeposit(plotIds[i]);
+        }
+    }
+
+    function confirmLandDeposit(uint256 plotId) public contractActive {
+        require(msg.sender == _landId_declaredDepositorAddress[plotId], "You didn't declare this land deposit");
+        address plotOwner = ISkybreachLandSale(_skybreachSC).getPlotOwner(plotId);
+        require(plotOwner == address(this), "The land hasn't been deposited yet");
+        _landId_confirmedDepositorAddress[plotId] = msg.sender;
+        delete _landId_declaredDepositorAddress[plotId];
+        // Update confirmed deposited lands for user
+        _user_depositedLands[msg.sender].push(plotId);
+        emit LandDepositConfirmed(plotId, msg.sender);
+    }
+
+    function confirmBatchLandDeposit(uint256[] calldata plotIds) external contractActive {
+        for (uint256 i=0; i<plotIds.length; i++) {
+            confirmLandDeposit(plotIds[i]);
+        }
+    }
+
+    function removeLandFromDeposited(address user, uint256 plotId) private {
+        uint256[] memory confirmedIds = _user_depositedLands[user];
+        uint256 index = 0;
+        uint256 found = 0;
+        for (uint256 i=0; i<confirmedIds.length; i++) {
+            if (confirmedIds[i] == plotId) {
+                index = i;
+                found = 1;
+            }
+        } 
+        require(found == 1, "Land to remove not found");
+        confirmedIds[index] = confirmedIds[confirmedIds.length-1];
+        delete confirmedIds[confirmedIds.length-1];
+        // Update storage of deposited lands
+        _user_depositedLands[user] = confirmedIds;
+    }
+
+    function withdrawDepositedLand(uint256 plotId) public {
+        require(msg.sender == _landId_confirmedDepositorAddress[plotId], "You have not deposited the land");
+        require(_landId_offerId[plotId] == NOT_IN_ANY_OFFER, "Land included in active offer");
+        ISkybreachLandSale(_skybreachSC).transfer(plotId, msg.sender);
+        delete _landId_confirmedDepositorAddress[plotId];
+        removeLandFromDeposited(msg.sender, plotId);
+        emit LandWithdrawn(plotId);
+    }
+
+    function withdrawLandAfterBought(address offerMaker, uint256 plotId) private {
+        require(offerMaker == _landId_confirmedDepositorAddress[plotId], "You have not deposited the land");
+        require(_landId_offerId[plotId] == NOT_IN_ANY_OFFER, "Land included in active offer");
+        ISkybreachLandSale(_skybreachSC).transfer(plotId, msg.sender);
+        delete _landId_confirmedDepositorAddress[plotId];
+        removeLandFromDeposited(offerMaker, plotId);
+        emit LandBoughtWithdrawn(plotId);
+    }
+
+    function withdrawBatchDepositedLands(uint256[] memory plotIds) public {
+        uint256 depositedLands = 0;
+        uint256 landsLength = plotIds.length;
+        uint256 landsInOtherOffers = 0;
+        for (uint256 i=0; i<landsLength; ) {
+            if (_landId_confirmedDepositorAddress[plotIds[i]] == msg.sender) {
+                depositedLands++;
+            }
+            if (_landId_offerId[plotIds[i]] != NOT_IN_ANY_OFFER) {
+                landsInOtherOffers++;
+            }
+            unchecked { ++i; }
+        }
+        require(depositedLands == landsLength, "Wrong deposited lands list");
+        require(landsInOtherOffers == 0, "One or more lands in some offers");
+        for (uint256 i=0; i<landsLength; ) {
+            withdrawDepositedLand(plotIds[i]);
+            unchecked { ++i; }
+        }
+    }
+
+    function withdrawLandsAfterBought(address offerMaker, uint256[] memory plotIds) private {
+
+        uint256 depositedLands = 0;
+        uint256 landsLength = plotIds.length;
+        uint256 landsInOtherOffers = 0;
+        for (uint256 i=0; i<landsLength; i++) {
+            if (_landId_confirmedDepositorAddress[plotIds[i]] == offerMaker) {
+                depositedLands++;
+            }
+            if (_landId_offerId[plotIds[i]] != NOT_IN_ANY_OFFER) {
+                landsInOtherOffers++;
+            }
+        }
+        require(depositedLands == landsLength, "Wrong deposited lands list");
+        require(landsInOtherOffers == 0, "One or more lands in some offers");
+        for (uint256 i=0; i<landsLength; i++) {
+            withdrawLandAfterBought(offerMaker, plotIds[i]);
+        }
+    }
+
+    // Create new land block offer
+    function createNewOffer(uint256[] calldata plotIds, uint256 price) external {
+
+        uint256 plotLength = plotIds.length;
+
+        require(price >= _minOfferPrice, "Minimum price for the offer not met");
+        require(plotLength >= _minLandsPerOffer, "Minimum amount of lands to create an offer not met");
+
+        uint256 notDepositedLands = 0;
+        uint256 notConfirmedLands = 0;
+        uint256 landsInOtherOffers = 0;
+
+        for (uint256 i=0; i<plotIds.length;) {
+            if (ISkybreachLandSale(_skybreachSC).getPlotOwner(plotIds[i]) != address(this)) {
+                notDepositedLands++;
+            }
+            if (_landId_confirmedDepositorAddress[plotIds[i]] != msg.sender) {
+                notConfirmedLands++;
+            }
+            if (_landId_offerId[plotIds[i]] != NOT_IN_ANY_OFFER) {
+                landsInOtherOffers++;
+            }
+            unchecked { ++i; }
+        }
+
+        require(notDepositedLands == 0, "You haven't deposited all the lands");
+        require(notConfirmedLands == 0, "You didn't confirm one or more land deposit");
+        require (landsInOtherOffers == 0, "One or more lands already in other offers");
+
+        // Creating the offer
+        _lastOfferId = _lastOfferId + 1;
+        uint256 actualOfferId = _lastOfferId;
+
+        // Binding lands to the new offer
+        addOfferBindings(plotIds, actualOfferId);
+
+        LandBlockOffer memory newOffer = LandBlockOffer(actualOfferId, price, msg.sender, plotIds, _serviceFee + _thirdPartPercentage, block.timestamp);
+
+        _user_offerIds[msg.sender].push(actualOfferId); // Adding the created of offer to its maker
+        _activeOfferIds.push(actualOfferId);            // Adding offer to actual active offers
+        _offerId_offer[actualOfferId] = newOffer;       // Adding offer info
+
+        if (_creationOfferFeeMandatory == 1) {
+            uint256 spendableAmount = getAllowance(msg.sender);
+            require(spendableAmount >= _offerCreationFee, "Minumum allowance to buy the block not met");
+            uint256 xcRMRKBalance = IERC20(_xcRmrkTokenSC).balanceOf(msg.sender);
+            require(xcRMRKBalance >= _offerCreationFee, "Not enough funds to cover service fee");
+            IERC20(_xcRmrkTokenSC).transferFrom(msg.sender, address(this), _offerCreationFee);
+        }
+
+        emit OfferCreated(actualOfferId, msg.sender, price);
+    }
+
+    // Cancel existing offer
+    function cancelOffer(uint256 offerId) external {
+        LandBlockOffer memory toDelete = _offerId_offer[offerId];
+        require (msg.sender == toDelete.offerMaker, "This offer is not created by you");
+        uint256[] memory landstoRemove = toDelete.landIds;
+
+        removeActiveOffer(offerId);
+        removeOfferFromUser(offerId, toDelete.offerMaker);
+        removeOfferBindings(landstoRemove);
+        removeOfferInfo(offerId);
+
+        emit OfferCancelled(offerId, toDelete.landIds);
+    }
+
+    // Remove offer from the active offers
+    function removeActiveOffer(uint256 offerId) private {
+        uint256 allOffersLength = _activeOfferIds.length;
+        uint256 toDeleteIndex = 0;
+        uint256 found = 0;
+        for (uint256 i=0; i<allOffersLength; i++) {
+            if (_activeOfferIds[i] == offerId) {
+                toDeleteIndex = i;
+                found = 1;
+            }
+        }
+        require(found == 1, "Offer to delete not found");
+        // Overwriting and deleting the target offer
+        _activeOfferIds[toDeleteIndex] = _activeOfferIds[allOffersLength-1];
+        delete _activeOfferIds[allOffersLength-1];
+        _activeOfferIds.pop();
+    }
+
+    // Remove cancelled offer from maker (address)
+    function removeOfferFromUser(uint256 offerId, address user) private {
+        uint256[] memory oldOUserOfferIds = _user_offerIds[user];
+        uint256 allOffersLength = oldOUserOfferIds.length;
+        uint256 toDeleteIndex = 0;
+        uint256 found = 0;
+        for (uint256 i=0; i<allOffersLength; i++) {
+            if (oldOUserOfferIds[i] == offerId) {
+                toDeleteIndex = i;
+                found = 1;
+            }
+        }
+        require(found == 1, "Offer to remove not found");
+        // Overwriting and deleting the target offer
+        oldOUserOfferIds[toDeleteIndex] = oldOUserOfferIds[allOffersLength-1];
+        delete oldOUserOfferIds[allOffersLength-1];
+        // Replacing user data with new updated data
+        _user_offerIds[user] = oldOUserOfferIds;
+        _user_offerIds[user].pop();
+    }
+
+    // Remove the binding offerId-landIds
+    function removeOfferBindings(uint256[] memory plotIds) private {
+        uint256 plotsLength = plotIds.length;
+        for (uint256 i=0; i<plotsLength; i++) {
+            _landId_offerId[plotIds[i]] = NOT_IN_ANY_OFFER;
+        }
+    }
+
+    // Remove info of the cancelled offer
+    function removeOfferInfo(uint256 offerId) private {
+        delete _offerId_offer[offerId];
+    }
+
+    // Add the bindings offerId-landIds
+    function addOfferBindings(uint256[] memory plotIds, uint256 offerId) private {
+        uint256 plotsLength = plotIds.length;
+        for (uint256 i=0; i<plotsLength; i++) {
+            _landId_offerId[plotIds[i]] = offerId;
+        }
+    }
+
+    function buyLandBlock(uint256 offerId) external {
+        LandBlockOffer memory blockToBuy = _offerId_offer[offerId];
+
+        uint256 serviceFee = blockToBuy.price * _serviceFee / 1000;
+        uint256 thirdPartFee = blockToBuy.price * _thirdPartPercentage / 1000;
+        uint256 sellerGain = blockToBuy.price - (serviceFee + thirdPartFee);
+
+        uint256 totalSpendableAmount = serviceFee + thirdPartFee + sellerGain;
+
+        require(totalSpendableAmount == blockToBuy.price, "Problems calculating service fee");
+
+        // Check buyer balance
+        uint256 spendableAmount = getAllowance(msg.sender);
+        require(spendableAmount >= totalSpendableAmount, "Minumum allowance to buy the block not met");
+
+        payLandBlock(sellerGain, blockToBuy.offerMaker, serviceFee, _thirdPartBeneficiary, thirdPartFee);
+
+        uint256[] memory landsToTransfer = blockToBuy.landIds;
+        // Deleting info about lands in other offers
+        removeOfferBindings(landsToTransfer);
+        // Needs to withdraw lands before delete the mapping
+        withdrawLandsAfterBought(blockToBuy.offerMaker, landsToTransfer);
+        for (uint256 i=0; i<landsToTransfer.length; i++) {
+            delete _landId_confirmedDepositorAddress[i];
+        }
+        removeActiveOffer(offerId);
+        removeOfferFromUser(offerId, blockToBuy.offerMaker);
+        delete _offerId_offer[offerId];
+
+        emit LandBlockBought(offerId, blockToBuy.landIds);
+
+    }
+
+    // Rescue a land that hans't been declared before deposit
+    function saveLand(uint256 plotId) external onlyOwner {
+        address notDeclared = _landId_declaredDepositorAddress[plotId];
+        require(notDeclared == address(0), "Land declared, impossible to save.");
+        ISkybreachLandSale(_skybreachSC).transfer(plotId, _smartContractOwner);
+    }
+
+    // HANDLE xcRMRKR
+
+    function withdrawTokens() external onlyOwnerOrAdmin {
+        uint256 amountAvailable = IERC20(_xcRmrkTokenSC).balanceOf(address(this));
+        require(amountAvailable > 0, "There are no funds to withdraw");
+        IERC20(_xcRmrkTokenSC).transfer(_smartContractOwner, amountAvailable);
+    }
+
+    function getAllowance(address buyer) private view returns (uint256) {
+        uint256 availableAmount = IERC20(_xcRmrkTokenSC).allowance(buyer, address(this));
+        return availableAmount;
+    }
+
+    function payLandBlock(uint256 sellerGain, address offerMaker, uint256 serviceFee, address thirdPart, uint256 thirdPartFee) private {
+        // Transfer tokens to the 3 addresses
+        IERC20(_xcRmrkTokenSC).transferFrom(msg.sender, offerMaker, sellerGain);    // Offer maker
+        IERC20(_xcRmrkTokenSC).transferFrom(msg.sender, address(this), serviceFee); // Service fee to the SC
+        IERC20(_xcRmrkTokenSC).transferFrom(msg.sender, thirdPart, thirdPartFee);   // Third part fee
+    }
+
+    // Explore offers and data
+
+    function getOfferDetails(uint256 offerId) view public returns(LandBlockOffer memory) {
+        return _offerId_offer[offerId];
+    }
+
+    function getOfferByUser(address user) view external returns(uint256[] memory) {
+        return _user_offerIds[user];
+    }
+
+    function getActiveOffersByAddress(address offersMaker) public view returns (uint256[] memory) {
+        return _user_offerIds[offersMaker];
+    }
+
+    function getContainingOfferId(uint256 plotId) view external returns (uint256) {
+        return _landId_offerId[plotId];
+    }
+
+    function getActiveOffersNumber() view external returns (uint256) {
+        return _activeOfferIds.length;
+    }
+
+    function getActiveOffers() view external returns(uint256[] memory) {
+        return _activeOfferIds;
+    }
+
+    function getMinLandsPerOffer() view external returns(uint256) {
+        return _minLandsPerOffer;
+    }
+
+    function setMinLandsPerOffer(uint256 minAmount) external {
+        _minLandsPerOffer = minAmount;
+    }
+
+    function getDepositedLandIds(address depositOwner) view external returns(uint256[] memory) {
+
+        uint256 index = 0;
+        uint256 amountDepositedLands = 0;
+
+        uint256[] memory userOffers = getActiveOffersByAddress(depositOwner);
+
+        for (uint256 i; i<userOffers.length; i++) {
+            LandBlockOffer memory offer = getOfferDetails(userOffers[i]);
+            uint256[] memory offerLandIds = offer.landIds;
+            for (uint256 j=0; j<offerLandIds.length; i++) {
+                amountDepositedLands++;
+            }
+        }
+        
+        uint256[] memory landIds = new uint256[](amountDepositedLands);
+
+        for (uint256 i; i<userOffers.length; i++) {
+            LandBlockOffer memory offer = getOfferDetails(userOffers[i]);
+            uint256[] memory offerLandIds = offer.landIds;
+            for (uint256 j=0; j<offerLandIds.length; i++) {
+                landIds[index] = offerLandIds[j];
+                index++;
+            }
+        }
+
+        return landIds;
+    }
+
+}
+
+// Land contract Interface
+interface ISkybreachLandSale {
+
+    function transfer(uint plotId, address newOwner) external;
+    function getPlotOwner(uint256 plotId) external view returns (address);
+
+}
+
+interface IERC20 {
+
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+
+}

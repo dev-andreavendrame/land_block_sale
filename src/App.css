@@ -36,3 +36,30 @@
     transform: rotate(360deg);
   }
 }
+
+.margin_20 {
+  margin: 20px;
+}
+
+.padding_20 {
+  padding: 20px;
+}
+
+.padding_bottom {
+  padding-bottom: 10px;
+  padding-left: 10px;
+}
+
+.margin_top_10 {
+  margin-top: 10px;
+}
+
+.padding_side_20 {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.margin_bottom_10 {
+  margin-bottom: 10px;
+}
+

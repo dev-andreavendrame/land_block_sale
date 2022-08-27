@@ -106,7 +106,7 @@ function App() {
             <div class="col-lg-3 col-xs-12 links">
               <h4 class="mt-lg-0 mt-sm-3">Links</h4>
               <ul class="m-0 p-0">
-                <li>- <a href="https://github.com/qwertyuiop9/skybreach">Github repository</a></li>
+                <li>- <a href="https://github.com/qwertyuiop9/land_block_sale">Github repository</a></li>
                 <li>- <a href="https://twitter.com/vendrame_and">Twitter</a></li>
                 <li>- <a href="https://www.superrisknft.com/">Website</a></li>
                 <li>- <a href="https://www.instagram.com/s_superrisk/">Instagram</a></li>

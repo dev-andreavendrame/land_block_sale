@@ -1,15 +1,9 @@
 import { React, useEffect, useState, useRef } from 'react';
-import { writeLandBlockSC, LAND_BLOCK_ABI, landBlockCA, readLandBlockSC } from './LandBlockSale';
-import { XC_RMRK_ABI, MOONRIVER_XC_RMRK_ADDRESS, MOONBASE_ALPHA_SKYBREACH_ADDRESS, SKYBREACH_ABI } from './Constants';
+import { writeLandBlockSC, landBlockCA, readLandBlockSC, smartContractSkybreach } from './LandBlockSale';
 
 import { ethers } from "ethers";
 
 function CreateOffer(props) {
-
-    // SC management
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const smartContractXCRMRK = new ethers.Contract(MOONRIVER_XC_RMRK_ADDRESS, XC_RMRK_ABI, provider.getSigner());
-    const smartContractSkybreach = new ethers.Contract(MOONBASE_ALPHA_SKYBREACH_ADDRESS, SKYBREACH_ABI, provider.getSigner());
 
     // Offer details
     const [landIdsInOffer, setLandIdsInOffer] = useState([]);
@@ -107,6 +101,7 @@ function CreateOffer(props) {
                 console.log("Deposit batch result: " + depositBatchResult);
             })
             .catch(error => {
+                console.log("land: " + landIds);
                 console.log("Deposit batch error: " + error);
             });
     }

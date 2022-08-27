@@ -2,16 +2,9 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ethers } from "ethers";
 import { useEffect, useState, useRef } from 'react';
-import { readLandBlockSC, writeLandBlockSC, LAND_BLOCK_ABI, landBlockCA } from './components/LandBlockSale';
+import { readLandBlockSC, writeLandBlockSC, landBlockCA, smartContractXCRMRK } from './components/LandBlockSale';
 import CreateOffer from './components/CreateOffer';
 import WithdrawComponent from './components/WithdrawComponent';
-
-import {
-  XC_RMRK_ABI,
-  MOONRIVER_XC_RMRK_ADDRESS,
-  MOONBASE_ALPHA_SKYBREACH_ADDRESS,
-  SKYBREACH_ABI
-} from './components/Constants';
 import Block from './components/Block';
 import HandleMyOffers from './components/MyOffers';
 
@@ -20,11 +13,6 @@ function App() {
   const [actualActiveOffers, setActualActiveOffers] = useState([]);
   const [accountAddress, setAccountAddress] = useState("click to connect -->");
   var activeOffersNumber = useRef(-1);
-
-  // SC management
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const smartContractXCRMRK = new ethers.Contract(MOONRIVER_XC_RMRK_ADDRESS, XC_RMRK_ABI, provider.getSigner());
-  const smartContractSkybreach = new ethers.Contract(MOONBASE_ALPHA_SKYBREACH_ADDRESS, SKYBREACH_ABI, provider.getSigner());
 
   function handleClick() {
     readLandBlockSC.getActiveOffers().then(offerIds => {

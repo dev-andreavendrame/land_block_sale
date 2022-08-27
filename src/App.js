@@ -68,7 +68,18 @@ function App() {
     <div class="container-p-3 my-3 bg-dark text-white">
       <div class='padding_20'>
         <div class="d-flex justify-content-between align-center">
-          <h1>Skybreach tools - Land Block Sale</h1>
+          <div class="col">
+            <div class="row">
+              <h1>Skybreach tools - Land Block Sale</h1>
+            </div>
+            <div class="row">
+              <div class="col-sm">
+                <a href="https://superrisk-studio.gitbook.io/skybreach-land-block-sale/" class="btn btn-outline-info" role="button" aria-pressed="true">Gitbook</a>
+
+              </div>
+            </div>
+          </div>
+
           <div class="row">
             <div class="col"></div>
             <h5>Connected wallet:</h5>
@@ -99,7 +110,6 @@ function App() {
           <div class="d-flex justify-content-end">
             <div class="wrapper">
               <h2>Skybreach tools - Land Block Sale
-
               </h2>
               <div class="padding_20">
                 <p class="pr-5 text-white-50">Skybreach tools - Land Block Sale (also shortened LBS) is a free dApp that has the aim to add a new feature by giving to the project users the possibility to sell Skybreach metaverse lands in block directly on-chain and without trust a third human part.</p>

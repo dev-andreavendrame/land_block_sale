@@ -8,7 +8,7 @@ import WithdrawComponent from './components/WithdrawComponent';
 
 import {
   XC_RMRK_ABI,
-  MOONBASE_ALPHA_XC_RMRK_ADDRESS,
+  MOONRIVER_XC_RMRK_ADDRESS,
   MOONBASE_ALPHA_SKYBREACH_ADDRESS,
   SKYBREACH_ABI
 } from './components/Constants';
@@ -23,7 +23,7 @@ function App() {
 
   // SC management
   const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const smartContractXCRMRK = new ethers.Contract(MOONBASE_ALPHA_XC_RMRK_ADDRESS, XC_RMRK_ABI, provider.getSigner());
+  const smartContractXCRMRK = new ethers.Contract(MOONRIVER_XC_RMRK_ADDRESS, XC_RMRK_ABI, provider.getSigner());
   const smartContractSkybreach = new ethers.Contract(MOONBASE_ALPHA_SKYBREACH_ADDRESS, SKYBREACH_ABI, provider.getSigner());
 
   function handleClick() {

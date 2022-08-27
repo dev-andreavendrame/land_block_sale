@@ -1,6 +1,6 @@
 import { React, useEffect, useState, useRef } from 'react';
 import { writeLandBlockSC, LAND_BLOCK_ABI, landBlockCA, readLandBlockSC } from './LandBlockSale';
-import { XC_RMRK_ABI, MOONBASE_ALPHA_XC_RMRK_ADDRESS, MOONBASE_ALPHA_SKYBREACH_ADDRESS, SKYBREACH_ABI } from './Constants';
+import { XC_RMRK_ABI, MOONRIVER_XC_RMRK_ADDRESS, MOONBASE_ALPHA_SKYBREACH_ADDRESS, SKYBREACH_ABI } from './Constants';
 
 import { ethers } from "ethers";
 
@@ -8,7 +8,7 @@ function CreateOffer(props) {
 
     // SC management
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const smartContractXCRMRK = new ethers.Contract(MOONBASE_ALPHA_XC_RMRK_ADDRESS, XC_RMRK_ABI, provider.getSigner());
+    const smartContractXCRMRK = new ethers.Contract(MOONRIVER_XC_RMRK_ADDRESS, XC_RMRK_ABI, provider.getSigner());
     const smartContractSkybreach = new ethers.Contract(MOONBASE_ALPHA_SKYBREACH_ADDRESS, SKYBREACH_ABI, provider.getSigner());
 
     // Offer details

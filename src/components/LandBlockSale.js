@@ -17,4 +17,4 @@ const provider = new ethers.providers.StaticJsonRpcProvider(providerURL, {
 const metamaskProvider = new ethers.providers.Web3Provider(window.ethereum);
 
 export const readLandBlockSC = new ethers.Contract(landBlockCA, LAND_BLOCK_ABI, provider);
-export const writeLandBlockSC = new ethers.Contract(landBlockCA, LAND_BLOCK_ABI, metamaskProvider.getSigner());
+export const writeLandBlockSC = new ethers.Contract(landBlockCA, LAND_BLOCK_ABI, metamaskProvider.getSigner()); 

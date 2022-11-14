@@ -1,12 +1,12 @@
 # Skybreach - Land Block Sale
 
-### 'Gitbook'
+## Gitbook
 
 Every information about how to use the dApp and its features are available and described in detail here -->
 
 https://app.gitbook.com/s/bSitxk9qHAu4QRXnzK4C/
 
-### 'dApp link'
+## dApp link
 
 Access dApp features here -->
 

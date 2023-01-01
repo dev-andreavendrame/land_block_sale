@@ -2,6 +2,7 @@ import { React, useEffect, useState, useRef } from 'react';
 import { writeLandBlockSC, landBlockCA, readLandBlockSC, smartContractSkybreach } from './LandBlockSale';
 
 import { ethers } from "ethers";
+import { Card, CardContent, Typography, Box, Grid, TextField, Button, CardActions } from '@mui/material';
 
 function CreateOffer(props) {
 
@@ -10,6 +11,11 @@ function CreateOffer(props) {
     const [blockPrice, setBlockPrice] = useState(-1);
     const [landsToSellIds, setLandsToSellIds] = useState([]);
     const [serviceFee, setServiceFee] = useState(null);
+
+    const [declareDepositButtonState, setDeclareDepositButtonState] = useState(false);
+    const [sendLandsButtonState, setSendLandsButtonState] = useState(false);
+    const [confirmDepositButtonState, setConfirmDepositButtonState] = useState(false);
+    const [createOfferButtonState, setCreateOfferButtonState] = useState(false);
 
     // Offer data
     const inputLandIdsRef = useRef(null);
@@ -24,65 +30,7 @@ function CreateOffer(props) {
     if (serviceFee == null) {
         getCurrentServiceFee();
     }
-    
 
-    return (
-        <div class="card bg-info">
-            <div class="card-body">
-                <h3 class="card-title">Create new offer</h3>
-                <div class="row padding_bottom">
-                    <div class="col-2">
-                        <h5>Lands to sell:</h5>
-                    </div>
-                    <div class="col">
-                        <input class="form-control input-sm" ref={inputLandIdsRef}
-                            type="text"
-                            id='createOfferLandIds'
-                            name='createOfferLandIds'
-                            placeholder={'Ids list:'}
-                        />
-                    </div>
-                </div>
-                <div class="row padding_bottom">
-                    <div class="col-2">
-                        <h5>Price in RMRK:</h5>
-                    </div>
-                    <div class="col">
-                        <input class="form-control input-sm" ref={inputPriceRef}
-                            type="text"
-                            id='offerPrice'
-                            name='offerPrice'
-                            placeholder={'RMRK amount: '}
-                        />
-                    </div>
-                </div>
-                <div class="row padding_bottom">
-                    <div class="col-2">
-                        <h5>Important info:</h5>
-                    </div>
-                    <div class="col">
-                        <h5>{serviceFee}</h5>
-                    </div>
-
-                </div>
-                <div class="row padding_20">
-                    <div class="col btn-block justify-content-center">
-                        <button type="button" class="btn btn-warning" onClick={declareBatchDeposit}>1 - Declare deposit</button>
-                    </div>
-                    <div class="col btn-block justify-content-center">
-                        <button type="button" class="btn btn-warning" onClick={sendLands}>2 - Send lands</button>
-                    </div>
-                    <div class="col btn-block justify-content-center">
-                        <button type="button" class="btn btn-warning" onClick={confirmBatchDeposit}>3 - Confirm deposit</button>
-                    </div>
-                </div>
-                <div class="col d-flex justify-content-center btn-block">
-                    <button type="button" class="btn btn-danger col-12" onClick={createOffer}>Create offer</button>
-                </div>
-            </div>
-        </div>
-
-    );
 
 
     function createOffer() {
@@ -153,7 +101,201 @@ function CreateOffer(props) {
 
     }
 
+
+
+    return (
+        <Box>
+            <Card sx={{ mb: 3, borderRadius: 3, boxShadow: 24, backgroundColor: '#63a9ff' }}>
+                <CardContent>
+                    <Typography sx={{ mb: 4, ml: 1, fontWeight: 600, fontSize: 26, color: "#282c34", mt: 2 }} variant='h3'>
+                        CREATE NEW OFFER
+                    </Typography>
+                    <Grid container direction='row' spacing={2} alignItems='center' sx={{ ml: 1 }}>
+                        <Grid item xs={2}>
+                            <Typography variant='h6' >
+                                Land to sell:
+                            </Typography>
+                        </Grid>
+
+                        <Grid item xs={3} container spacing={1} alignItems='center'>
+                            <Grid item xs={4}>
+                                <TextField
+                                    inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
+                                    size='small'
+                                    type='number'
+                                    required
+                                    id="x_coordinate"
+                                    name="x_coordinate"
+                                    onChange={inputLandIdsRef}
+                                    placeholder="X"
+                                />
+                            </Grid>
+                            <Grid item xs={4}>
+                                <TextField
+                                    inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
+                                    size='small'
+                                    type='number'
+                                    required
+                                    id="y_coordinate"
+                                    name="y_coordinate"
+                                    onChange={inputLandIdsRef}
+                                    placeholder="Y"
+                                />
+                            </Grid>
+                            <Grid item xs={4}>
+                                <Button className='yellowButton' variant='contained' sx={{ fontWeight: 'bold', color: '#282c34' }}>
+                                    Add
+                                </Button>
+                            </Grid>
+                        </Grid>
+
+                        <Grid item xs={7}>
+                            <Box sx={{ ml: 4 }}>
+                                <Typography variant='h6' color='#555555' >
+                                    Lands:
+                                </Typography>
+                            </Box>
+                        </Grid>
+                    </Grid>
+
+
+
+                    <Grid container direction='row' spacing={2} alignItems='center' sx={{ ml: 1, mt: 0 }}>
+                        <Grid item xs={2}>
+                            <Typography variant='h6' >
+                                Price in RMRK:
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <TextField
+                                inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
+                                size='small'
+                                type='number'
+                                required
+                                id="rmrk_price"
+                                name="rmrk_price"
+                                onChange={inputPriceRef}
+                                placeholder="RMRK amount"
+                            />
+                        </Grid>
+
+                        <Grid item xs={7}>
+                            <Box sx={{ ml: 4 }}>
+                                <Typography variant='h6' color='#555555' >
+                                    Actual service fee:
+                                </Typography>
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+
+                <CardActions>
+                    <Grid container direction='row' spacing={2} alignItems='center' sx={{ ml: 2, mt: 0, mb: 2 }}>
+                        <Grid item xs={1.4}>
+                            <Button className='yellowButton' disabled={!declareDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 2 }}>
+                                Declare deposit
+                            </Button>
+                        </Grid>
+                        <Grid item xs={1.4}>
+                            <Button className='yellowButton' disabled={!sendLandsButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 2 }}>
+                                Send lands
+                            </Button>
+                        </Grid>
+                        <Grid item xs={1.4}>
+                            <Button className='yellowButton' disabled={!confirmDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 2 }}>
+                                Confirm deposit
+                            </Button>
+                        </Grid>
+                        <Grid item xs={1.2}>
+                        </Grid>
+                        <Grid item xs={1.5}>
+                            <Button className='redWhiteButton' disabled={!createOfferButtonState} variant='outlined' size='medium' sx={{ fontWeight: 600, backgroundColor: '#cf2020', width: 100, height: 70, borderRadius: 3, border: '4px solid',}}>
+                                Create offer
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </CardActions>
+            </Card>
+
+
+
+            <div class="card bg-info">
+                <div class="card-body">
+                    <h3 class="card-title">Create new offer</h3>
+                    <div class="row padding_bottom">
+                        <div class="col-2">
+                            <h5>Lands to sell:</h5>
+                        </div>
+                        <div class="col">
+                            <input class="form-control input-sm" ref={inputLandIdsRef}
+                                type="text"
+                                id='createOfferLandIds'
+                                name='createOfferLandIds'
+                                placeholder={'Ids list:'}
+                            />
+                        </div>
+                    </div>
+                    <div class="row padding_bottom">
+                        <div class="col-2">
+                            <h5>Price in RMRK:</h5>
+                        </div>
+                        <div class="col">
+                            <input class="form-control input-sm" ref={inputPriceRef}
+                                type="text"
+                                id='offerPrice'
+                                name='offerPrice'
+                                placeholder={'RMRK amount: '}
+                            />
+                        </div>
+                    </div>
+                    <div class="row padding_bottom">
+                        <div class="col-2">
+                            <h5>Important info:</h5>
+                        </div>
+                        <div class="col">
+                            <h5>{serviceFee}</h5>
+                        </div>
+
+                    </div>
+                    <div class="row padding_20">
+                        <div class="col btn-block justify-content-center">
+                            <button type="button" class="btn btn-warning" onClick={declareBatchDeposit}>1 - Declare deposit</button>
+                        </div>
+                        <div class="col btn-block justify-content-center">
+                            <button type="button" class="btn btn-warning" onClick={sendLands}>2 - Send lands</button>
+                        </div>
+                        <div class="col btn-block justify-content-center">
+                            <button type="button" class="btn btn-warning" onClick={confirmBatchDeposit}>3 - Confirm deposit</button>
+                        </div>
+                    </div>
+                    <div class="col d-flex justify-content-center btn-block">
+                        <button type="button" class="btn btn-danger col-12" onClick={createOffer}>Create offer</button>
+                    </div>
+                </div>
+            </div>
+        </Box >
+
+    );
+
 } export default CreateOffer;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function decodeOfferLands(rawText) {
 

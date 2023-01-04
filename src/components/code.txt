@@ -8,7 +8,7 @@ contract LandBlock {
     address public _userDataSC;
     address public _xcRmrkTokenSC;
     uint256 public _tokenDecimals = 1*10**10;
-    // Internal variables for services
+    // Internal variables for servic es
     uint256 private NOT_IN_ANY_OFFER = 0;
     uint256 public _serviceFee; 
     uint256 public _creationOfferFeeMandatory;  // 0 = no fee for creating offer, 1 yes

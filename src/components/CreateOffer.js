@@ -216,63 +216,6 @@ function CreateOffer(props) {
                     </Grid>
                 </CardActions>
             </Card>
-
-
-
-            <div class="card bg-info">
-                <div class="card-body">
-                    <h3 class="card-title">Create new offer</h3>
-                    <div class="row padding_bottom">
-                        <div class="col-2">
-                            <h5>Lands to sell:</h5>
-                        </div>
-                        <div class="col">
-                            <input class="form-control input-sm" ref={inputLandIdsRef}
-                                type="text"
-                                id='createOfferLandIds'
-                                name='createOfferLandIds'
-                                placeholder={'Ids list:'}
-                            />
-                        </div>
-                    </div>
-                    <div class="row padding_bottom">
-                        <div class="col-2">
-                            <h5>Price in RMRK:</h5>
-                        </div>
-                        <div class="col">
-                            <input class="form-control input-sm" ref={inputPriceRef}
-                                type="text"
-                                id='offerPrice'
-                                name='offerPrice'
-                                placeholder={'RMRK amount: '}
-                            />
-                        </div>
-                    </div>
-                    <div class="row padding_bottom">
-                        <div class="col-2">
-                            <h5>Important info:</h5>
-                        </div>
-                        <div class="col">
-                            <h5>{serviceFee}</h5>
-                        </div>
-
-                    </div>
-                    <div class="row padding_20">
-                        <div class="col btn-block justify-content-center">
-                            <button type="button" class="btn btn-warning" onClick={declareBatchDeposit}>1 - Declare deposit</button>
-                        </div>
-                        <div class="col btn-block justify-content-center">
-                            <button type="button" class="btn btn-warning" onClick={sendLands}>2 - Send lands</button>
-                        </div>
-                        <div class="col btn-block justify-content-center">
-                            <button type="button" class="btn btn-warning" onClick={confirmBatchDeposit}>3 - Confirm deposit</button>
-                        </div>
-                    </div>
-                    <div class="col d-flex justify-content-center btn-block">
-                        <button type="button" class="btn btn-danger col-12" onClick={createOffer}>Create offer</button>
-                    </div>
-                </div>
-            </div>
         </Box >
 
     );

@@ -23,11 +23,14 @@ const ExpandMore = styled((props) => {
 }));
 
 function OfferCard(props) {
+
     const [expanded, setExpanded] = useState(false);
+    const landNumeration = 1;
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
+
 
     return (
         <Card sx={{ mb: 3, maxWidth: 345, borderRadius: 3, boxShadow: 24, }}>
@@ -54,9 +57,33 @@ function OfferCard(props) {
                     </ExpandMore>
                 </Box>
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
-                    <Typography paragraph>
-                        landList
-                    </Typography>
+
+
+                    <Box display='flex' justifyContent='space-between' sx={{ p: 1, backgroundColor: 'red' }}>
+                        <Typography variant='body2' color='white'>
+                            1° (15, 22)
+                        </Typography>
+                        <Typography variant='body2' color='white'>
+                            Leggendaria
+                        </Typography>
+                    </Box>
+                    <Box display='flex' justifyContent='space-between' sx={{ p: 1, backgroundColor: 'green' }}>
+                        <Typography variant='body2' color='white'>
+                            (18, 6)
+                        </Typography>
+                        <Typography variant='body2' color='white'>
+                            Comune
+                        </Typography>
+                    </Box>
+                    <Box display='flex' justifyContent='space-between' sx={{ p: 1, backgroundColor: 'blue' }}>
+                        <Typography variant='body2' color='white'>
+                            (132, 55)
+                        </Typography>
+                        <Typography variant='body2' color='white'>
+                            Rara
+                        </Typography>
+                    </Box>
+
                 </Collapse>
             </CardContent>
 
@@ -73,17 +100,63 @@ function OfferCard(props) {
                             <Typography sx={{ mr: 5 }}>
                                 Gifts contained:
                             </Typography>
-                            <DoneOutlineIcon sx={{ ml: 5 }}/>
+                            <DoneOutlineIcon sx={{ ml: 5 }} />
                         </Box>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                             <Typography sx={{ mr: 5 }}>
                                 Adjacency bonus:
                             </Typography>
-                            <DoneOutlineIcon sx={{ ml: 5 }}/>
+                            <DoneOutlineIcon sx={{ ml: 5 }} />
                         </Box>
                     </Box>
                 </Box>
             </CardActions>
-        </Card>
+        </Card >
     );
 } export default OfferCard;
+
+
+
+
+/*
+    /-----------------------/
+    /----- SPIEGAZIONE -----/
+    /-----------------------/
+
+    Dentro il "Collapse", al posto del codice di prova, andrà inserito il MAP prendendo i dati delle land 
+    inserite nell'offerta.
+
+    Ipotizziamo che tra i dati ci siano:
+        -   le coordinate della land (string -> "( X, Y)")
+        -   la rarità (string -> "R")
+
+    Il mapping creerà un Box il cui colore dipenderà dalla rarità della land: bisognerà creare una 
+    funzione "checkRarity(string)" che, presa la rarità della land, restituirà un colore.
+    
+    All'interno del Box ci sarà un Typography che andrà a scrivere il numero cardinale della land 
+    (in ordine di inserimento nell'offerta), seguito dalle coordinate della land e dalla sua rarità.
+
+
+    /------------------/
+    /----- CODICE -----/
+    /------------------/
+
+            {
+              LAND_LIST.map((info) => {
+                return (
+                    <Box display='inline-flex' justifyContent='space-between' 
+                        sx={{ p: 1, backgroundColor: {checkRarity(info.rarity)} }}>
+                        <Typography variant='body2' color='white'>
+                            { landNumeration + " " + info.coordinates}
+                        </Typography>
+                        <Typography variant='body2' color='white'>
+                            {info.rarity}
+                        </Typography>
+                    </Box>
+                )
+              }
+              );
+              landNumeration++;
+            }
+
+*/

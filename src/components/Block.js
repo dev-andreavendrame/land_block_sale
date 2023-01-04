@@ -1,6 +1,6 @@
-import { React, useEffect, useState, useRef } from 'react';
-import { readLandBlockSC, writeLandBlockSC, LAND_BLOCK_ABI, landBlockCA } from './LandBlockSale';
-import { XC_RMRK_ABI, MOONRIVER_XC_RMRK_ADDRESS, MOONBASE_ALPHA_SKYBREACH_ADDRESS, SKYBREACH_ABI } from './Constants';
+import { React, useEffect, useState } from 'react';
+import { readLandBlockSC, writeLandBlockSC, landBlockCA } from './LandBlockSale';
+import { XC_RMRK_ABI, MOONRIVER_XC_RMRK_ADDRESS } from './Constants';
 import { ethers } from "ethers";
 
 function Block(props) {

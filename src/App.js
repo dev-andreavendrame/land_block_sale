@@ -14,13 +14,17 @@ import MyOffers from './components/MyOffers';
 import SRSlogo from './components/images/SRS_logo.png';
 import OfferCard from './components/OfferCard';
 
+// New imports
+import { landBlockSalesReadable } from './components/smartContracts/MoonriverConfig.js';
+
 function App() {
 
   const [actualActiveOffers, setActualActiveOffers] = useState([]);
   const [currentAccount, setCurrentAccount] = useState("");
   var activeOffersNumber = useRef(-1);
 
-  function handleClick() {
+  function handleClickBackup() {
+
     readLandBlockSC.getActiveOffers().then(offerIds => {
       setActualActiveOffers(offerIds);
       // Change state
@@ -30,6 +34,18 @@ function App() {
       console.log("Errore: " + error);
       setActualActiveOffers([]);
     });
+  }
+
+  function handleClick() {
+    landBlockSalesReadable.getActiveOffers()
+    .then((offerIds) => {
+      console.log("Offerte con la nuova configurazione: [" + offerIds + "]");
+      setActualActiveOffers(offerIds);
+    }).catch(error => {
+      console.log("Errore handleClick");
+      console.log(error);
+      setActualActiveOffers([]);
+    })
   }
 
 
@@ -97,7 +113,7 @@ function App() {
 
   useEffect(() => {
 
-  }, [activeOffersNumber]);
+  }, []);
 
   return (
     <div className="App" class="bg" >
@@ -138,7 +154,10 @@ function App() {
 
       <div class="mt-5 container">
         <CreateOffer create_offer={0} />
-        <OfferCard />
+
+        {actualActiveOffers.map(offerId => (
+            <OfferCard id={offerId} key={offerId} />
+          ))}
 
         
 

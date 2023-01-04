@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { React, useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -9,6 +9,10 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
 import { Box, IconButton } from '@mui/material';
+
+// Logic imports
+import { landBlockSalesReadable } from '../components/smartContracts/MoonriverConfig';
+import { ethers } from "ethers";
 
 
 const ExpandMore = styled((props) => {
@@ -24,24 +28,68 @@ const ExpandMore = styled((props) => {
 
 function OfferCard(props) {
 
+    // Parent passed values
+    const currentOfferId = props.id;
+
+    // Component state variables
+    const [offerDetails, setOfferDetails] = useState(null);
+    const [landIdsInOffer, setLandIdsInOffer] = useState([]);
+    const [blockPrice, setBlockPrice] = useState(-1);
+    const [serviceFee, setServiceFee] = useState("Loading");
+    const [offerTimestamp, setOfferTimestamp] = useState(-1);
+    const [isInitializedWithDetails, setIsInitializedWithDetails] = useState(false);
+    const [offerMaker, setOfferMaker] = useState("Loading...");
+
     const [expanded, setExpanded] = useState(false);
-    const landNumeration = 1;
+    const [landsListDetails, setLandsListDetails] = useState({});
+    var landNumeration = 1;
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
 
+    useEffect(() => {
+
+        if (!isInitializedWithDetails) {
+            // Get offer details on component creation
+            landBlockSalesReadable.getOfferDetails(currentOfferId)
+                .then(details => {
+                    console.log("Dettagli reperiti: " + details);
+                    setOfferDetails(details);
+                    // Decoding offer data
+                    if (offerDetails != null) {
+                        console.log("Decoding offer deta...");
+                        setLandIdsInOffer(decodeLandIdsFromCall(offerDetails['landIds']));
+                        setBlockPrice(offerDetails['price']);
+                        setServiceFee(offerDetails['serviceFee']);
+                        setOfferTimestamp(offerDetails['timestamp']);
+                        setOfferMaker(offerDetails['offerMaker']);
+
+                        // Stop refresh updating initialization
+                        setIsInitializedWithDetails(true);
+                    }
+                })
+                .catch(error => {
+                    console.log("Error : " + error);
+                });
+        }
+
+    });
+
+
+
+
 
     return (
         <Card sx={{ mb: 3, maxWidth: 345, borderRadius: 3, boxShadow: 24, }}>
             <CardHeader
-                title={"Offer: " + props.idNumber} />
+                title={"Offer ID: " + props.id} />
             <CardContent>
                 <Typography paragraph>
-                    Price:
+                    Price: {getRMRKBlockPrice(blockPrice)}
                 </Typography>
                 <Typography paragraph>
-                    Total lands contained:
+                    Total lands contained: {landIdsInOffer.length}
                 </Typography>
                 <Box display='inline-flex' alignItems='center'>
                     <Typography variant='body2' color="text.secondary" >
@@ -90,10 +138,10 @@ function OfferCard(props) {
             <CardActions>
                 <Box sx={{ p: 1 }}>
                     <Typography paragraph>
-                        Created by:
+                        Created by: {offerMaker}
                     </Typography>
                     <Typography paragraph>
-                        Creator fee:
+                        Creator fee: {serviceFee / 10}%
                     </Typography>
                     <Box display='flex' flexDirection='column'>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
@@ -104,7 +152,7 @@ function OfferCard(props) {
                         </Box>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                             <Typography sx={{ mr: 5 }}>
-                                Adjacency bonus:
+                                Adjacency bonus: {hasAdjacencyBonus(landIdsInOffer) + ""}
                             </Typography>
                             <DoneOutlineIcon sx={{ ml: 5 }} />
                         </Box>
@@ -114,6 +162,62 @@ function OfferCard(props) {
         </Card >
     );
 } export default OfferCard;
+
+
+function decodeLandIdsFromCall(encodedIds) {
+    var ids = [];
+    for (let i = 0; i < encodedIds.length; i++) {
+        ids.push(ethers.utils.formatEther(encodedIds[i]) * 10 ** 18);
+    }
+    return ids;
+}
+
+function getRMRKBlockPrice(landBlockPrice) {
+    var price = landBlockPrice / 10 ** 10;
+    return price + " RMRK";
+}
+
+function getFormattedLandId(landId) {
+    const y = Math.floor(landId / 256);
+    const x = landId % 256;
+    return "(" + x + "," + y + ") ";
+}
+
+
+function hasAdjacencyBonus(landIds) {
+
+    if (landIds.length < 9) {
+        return false;
+    }
+
+    var hasBonus = false;
+
+    for (let i=0; i<landIds.length; i++) {
+        var currentHasBonus = true;
+        const currentLandId = landIds[i];
+        const y = Math.floor(currentLandId / 256);
+        const x = currentLandId % 256;
+
+        currentHasBonus = currentHasBonus & landIds.includes((y+1)*256+(x-1))   // top left corner
+        currentHasBonus = currentHasBonus & landIds.includes((y+1)*256+(x))     // top middle
+        currentHasBonus = currentHasBonus & landIds.includes((y+1)*256+(x+1))   // top right corner
+
+        currentHasBonus = currentHasBonus & landIds.includes((y)*256+(x-1))     // left side 
+        currentHasBonus = currentHasBonus & landIds.includes((y)*256+(x+1))     // right side
+
+        currentHasBonus = currentHasBonus & landIds.includes((y-1)*256+(x-1))   // bottom left corner
+        currentHasBonus = currentHasBonus & landIds.includes((y-1)*256+(x))     // bottom middle
+        currentHasBonus = currentHasBonus & landIds.includes((y-1)*256+(x+1))   // bottom right corner
+
+        // We need only one land to have the bonus to end the function
+        if (currentHasBonus) {
+            return true;
+        }
+    }
+
+    return hasBonus;
+    
+}
 
 
 

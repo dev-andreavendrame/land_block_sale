@@ -27,6 +27,19 @@
 		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_plotId",
+				"type": "uint256"
+			}
+		],
+		"name": "LandBoughtWithdrawn",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
 				"indexed": true,
 				"internalType": "uint256",
 				"name": "_landId",
@@ -59,10 +72,16 @@
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": false,
+				"indexed": true,
 				"internalType": "uint256",
 				"name": "_id",
 				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256[]",
+				"name": "plotIds",
+				"type": "uint256[]"
 			}
 		],
 		"name": "OfferCancelled",
@@ -94,25 +113,6 @@
 		"type": "event"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "_activeOfferIds",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "_creationOfferFeeMandatory",
 		"outputs": [
@@ -139,93 +139,8 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "_landId_confirmedDepositorAddress",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "_landId_declaredDepositorAddress",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "_lastOfferId",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "_offerId_offer",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "offerId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "price",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "offerMaker",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "serviceFee",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "_serviceFee",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -337,11 +252,11 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "offerId",
 				"type": "uint256"
 			}
 		],
-		"name": "approveXcRMRK",
+		"name": "buyLandBlock",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -354,20 +269,20 @@
 				"type": "uint256"
 			}
 		],
-		"name": "buyLandBlock",
+		"name": "cancelOffer",
 		"outputs": [],
-		"stateMutability": "payable",
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "offerId",
-				"type": "uint256"
+				"internalType": "uint256[]",
+				"name": "plotIds",
+				"type": "uint256[]"
 			}
 		],
-		"name": "cancelOffer",
+		"name": "confirmBatchLandDeposit",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -400,7 +315,20 @@
 		],
 		"name": "createNewOffer",
 		"outputs": [],
-		"stateMutability": "payable",
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "plotIds",
+				"type": "uint256[]"
+			}
+		],
+		"name": "declareBatchLandDeposit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -418,26 +346,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "getActiveOffersNumber",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "offersMaker",
-				"type": "address"
-			}
-		],
-		"name": "getActiverOffers",
+		"name": "getActiveOffers",
 		"outputs": [
 			{
 				"internalType": "uint256[]",
@@ -452,11 +361,24 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "buyer",
+				"name": "offersMaker",
 				"type": "address"
 			}
 		],
-		"name": "getAllowance",
+		"name": "getActiveOffersByAddress",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getActiveOffersNumber",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -490,6 +412,121 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "depositOwner",
+				"type": "address"
+			}
+		],
+		"name": "getDepositedLandIds",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getMinLandsPerOffer",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getOfferByUser",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "offerId",
+				"type": "uint256"
+			}
+		],
+		"name": "getOfferDetails",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "offerMaker",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256[]",
+						"name": "landIds",
+						"type": "uint256[]"
+					},
+					{
+						"internalType": "uint256",
+						"name": "serviceFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct LandBlock.LandBlockOffer",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getServiceFee",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "admin",
 				"type": "address"
 			}
@@ -509,23 +546,13 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "blockPrice",
+				"name": "plotId",
 				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "blockFee",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "offerMaker",
-				"type": "address"
 			}
 		],
-		"name": "payLandBlock",
+		"name": "rescueLand",
 		"outputs": [],
-		"stateMutability": "payable",
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -537,19 +564,6 @@
 			}
 		],
 		"name": "revokeAdmin",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "plotId",
-				"type": "uint256"
-			}
-		],
-		"name": "saveLand",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -585,12 +599,79 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "serviceFee",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "thirdPartFee",
+				"type": "uint256"
+			}
+		],
+		"name": "setFees",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "plotId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "originalOwner",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "rescueFee",
+				"type": "uint256"
+			}
+		],
+		"name": "setLandRescuable",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "minAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "setMinLandsPerOffer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "newSkybreachAddress",
 				"type": "address"
 			}
 		],
 		"name": "setSkybreachContractAddress",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "thirdPart",
+				"type": "address"
+			}
+		],
+		"name": "setThirdPartBeneficiary",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

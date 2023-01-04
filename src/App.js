@@ -12,6 +12,7 @@ import Block from './components/Block';
 import MyOffers from './components/MyOffers';
 
 import SRSlogo from './components/images/SRS_logo.png';
+import OfferCard from './components/OfferCard';
 
 function App() {
 
@@ -137,6 +138,9 @@ function App() {
 
       <div class="mt-5 container">
         <CreateOffer create_offer={0} />
+        <OfferCard />
+
+        
 
         <MyOffers connected_wallet={currentAccount} />
 

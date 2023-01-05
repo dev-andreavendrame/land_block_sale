@@ -15,18 +15,13 @@ const errorLink = onError(({ graphqlErrors, networkError }) => {
   }
 });
 
-const link = from([
-  errorLink,
-  new HttpLink({ uri: "https://squid.subsquid.io/skybreach-landsale-analytics/v/v16/graphql" }),
-]);
-
-export const client = new ApolloClient({
+export const subsquidClient = new ApolloClient({
   cache: new InMemoryCache(),
   uri: "https://squid.subsquid.io/skybreach-landsale-analytics/v/v16/graphql",
 })
 
 // Test query
-client
+subsquidClient
   .query({
     query: gql`
     query MyQuery {
@@ -48,7 +43,7 @@ client
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <ApolloProvider client={client}>
+  <ApolloProvider client={subsquidClient}>
     <React.StrictMode>
       <App />
     </React.StrictMode>

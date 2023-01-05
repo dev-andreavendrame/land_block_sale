@@ -9,10 +9,12 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
 import { Box, IconButton } from '@mui/material';
+import LandListEntry from './minorComponents/LandListEntry';
 
-// Logic imports
+// Blockchain imports
 import { landBlockSalesReadable } from '../components/smartContracts/MoonriverConfig';
 import { ethers } from "ethers";
+
 
 
 const ExpandMore = styled((props) => {
@@ -73,10 +75,7 @@ function OfferCard(props) {
                     console.log("Error : " + error);
                 });
         }
-
     });
-
-
 
 
 
@@ -105,33 +104,16 @@ function OfferCard(props) {
                     </ExpandMore>
                 </Box>
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
-
-
-                    <Box display='flex' justifyContent='space-between' sx={{ p: 1, backgroundColor: 'red' }}>
-                        <Typography variant='body2' color='white'>
-                            1° (15, 22)
-                        </Typography>
-                        <Typography variant='body2' color='white'>
-                            Leggendaria
-                        </Typography>
-                    </Box>
-                    <Box display='flex' justifyContent='space-between' sx={{ p: 1, backgroundColor: 'green' }}>
-                        <Typography variant='body2' color='white'>
-                            (18, 6)
-                        </Typography>
-                        <Typography variant='body2' color='white'>
-                            Comune
-                        </Typography>
-                    </Box>
-                    <Box display='flex' justifyContent='space-between' sx={{ p: 1, backgroundColor: 'blue' }}>
-                        <Typography variant='body2' color='white'>
-                            (132, 55)
-                        </Typography>
-                        <Typography variant='body2' color='white'>
-                            Rara
-                        </Typography>
-                    </Box>
-
+                    {
+                        landIdsInOffer.map((landId) => {
+                            return (
+                                <LandListEntry
+                                    key={landId}
+                                    id={landId}
+                                />
+                            );
+                        })
+                    }
                 </Collapse>
             </CardContent>
 
@@ -177,12 +159,6 @@ function getRMRKBlockPrice(landBlockPrice) {
     return price + " RMRK";
 }
 
-function getFormattedLandId(landId) {
-    const y = Math.floor(landId / 256);
-    const x = landId % 256;
-    return "(" + x + "," + y + ") ";
-}
-
 
 function hasAdjacencyBonus(landIds) {
 
@@ -192,22 +168,22 @@ function hasAdjacencyBonus(landIds) {
 
     var hasBonus = false;
 
-    for (let i=0; i<landIds.length; i++) {
+    for (let i = 0; i < landIds.length; i++) {
         var currentHasBonus = true;
         const currentLandId = landIds[i];
         const y = Math.floor(currentLandId / 256);
         const x = currentLandId % 256;
 
-        currentHasBonus = currentHasBonus & landIds.includes((y+1)*256+(x-1))   // top left corner
-        currentHasBonus = currentHasBonus & landIds.includes((y+1)*256+(x))     // top middle
-        currentHasBonus = currentHasBonus & landIds.includes((y+1)*256+(x+1))   // top right corner
+        currentHasBonus = currentHasBonus & landIds.includes((y + 1) * 256 + (x - 1))   // top left corner
+        currentHasBonus = currentHasBonus & landIds.includes((y + 1) * 256 + (x))     // top middle
+        currentHasBonus = currentHasBonus & landIds.includes((y + 1) * 256 + (x + 1))   // top right corner
 
-        currentHasBonus = currentHasBonus & landIds.includes((y)*256+(x-1))     // left side 
-        currentHasBonus = currentHasBonus & landIds.includes((y)*256+(x+1))     // right side
+        currentHasBonus = currentHasBonus & landIds.includes((y) * 256 + (x - 1))     // left side 
+        currentHasBonus = currentHasBonus & landIds.includes((y) * 256 + (x + 1))     // right side
 
-        currentHasBonus = currentHasBonus & landIds.includes((y-1)*256+(x-1))   // bottom left corner
-        currentHasBonus = currentHasBonus & landIds.includes((y-1)*256+(x))     // bottom middle
-        currentHasBonus = currentHasBonus & landIds.includes((y-1)*256+(x+1))   // bottom right corner
+        currentHasBonus = currentHasBonus & landIds.includes((y - 1) * 256 + (x - 1))   // bottom left corner
+        currentHasBonus = currentHasBonus & landIds.includes((y - 1) * 256 + (x))     // bottom middle
+        currentHasBonus = currentHasBonus & landIds.includes((y - 1) * 256 + (x + 1))   // bottom right corner
 
         // We need only one land to have the bonus to end the function
         if (currentHasBonus) {
@@ -216,7 +192,7 @@ function hasAdjacencyBonus(landIds) {
     }
 
     return hasBonus;
-    
+
 }
 
 

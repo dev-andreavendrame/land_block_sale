@@ -3,12 +3,57 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+// Graphql Client
+import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, from } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
+
+const errorLink = onError(({ graphqlErrors, networkError }) => {
+  if (graphqlErrors) {
+    graphqlErrors.map(({ message, location, path }) => {
+      alert('Graphql error ${message} ');
+    });
+  }
+});
+
+const link = from([
+  errorLink,
+  new HttpLink({ uri: "https://squid.subsquid.io/skybreach-landsale-analytics/v/v16/graphql" }),
+]);
+
+export const client = new ApolloClient({
+  cache: new InMemoryCache(),
+  uri: "https://squid.subsquid.io/skybreach-landsale-analytics/v/v16/graphql",
+})
+
+// Test query
+client
+  .query({
+    query: gql`
+    query MyQuery {
+      plotById(id: "36413") {
+        id
+        data {
+          rarity
+        }
+      }
+    }
+    `,
+  })
+  .then((result) => {
+    console.log("Query test result:");
+    console.log(result);
+    const data = result['data']['plotById']['data']['rarity'];
+    console.log(data);
+  }
+  );
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <ApolloProvider client={client}>
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  </ApolloProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

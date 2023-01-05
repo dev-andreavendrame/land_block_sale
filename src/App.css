@@ -126,7 +126,7 @@
 
 
 .blueButton {
-  color: #4180CB !important;
+  color: #0081c9 !important;
 }
 
 .redWhiteButton {
@@ -144,9 +144,36 @@
 }
 
 .yellowButton  {
-  background-color: #f3e141 !important;
+  background-color: #FFC93C !important;
 }
 .yellowButton:disabled {
   background-color: #8d8d8d !important;
   color: #696969 !important;
 }
+
+
+.blueGradient {
+  background: linear-gradient(0deg, #5BC0F8, #86E5FF);
+}
+
+.lightGreyGradient {
+  background: linear-gradient(180deg, #b6b6b633, transparent);
+}
+
+
+/*
+
+  /-------------------------/
+  /----- Color Palette -----/
+  /-------------------------/
+
+  0081C9  - Sea Blue
+  5BC0F8  - Clear Sky
+  86E5FF  - Cold Sky
+  FFC93C  - Crayon Sun
+
+  696969  - Medium Grey
+  8d8d8d  - Light Grey
+  b6b6b6  - White Grey
+
+*/

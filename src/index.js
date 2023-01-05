@@ -41,9 +41,8 @@ client
   })
   .then((result) => {
     console.log("Query test result:");
-    console.log(result);
     const data = result['data']['plotById']['data']['rarity'];
-    console.log(data);
+    console.log("Land plot rarity: %d", data);
   }
   );
 

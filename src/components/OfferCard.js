@@ -8,13 +8,14 @@ import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { Box, IconButton, Button } from '@mui/material';
 import LandListEntry from './minorComponents/LandListEntry';
 
 // Blockchain imports
 import { landBlockSalesReadable } from '../components/smartContracts/MoonriverConfig';
 import { ethers } from "ethers";
-
+import { CHUNKY_LAND_IDS, GIFT_LAND_IDS } from './minorComponents/SkybreachTempData';
 
 
 const ExpandMore = styled((props) => {
@@ -42,9 +43,14 @@ function OfferCard(props) {
     const [isInitializedWithDetails, setIsInitializedWithDetails] = useState(false);
     const [offerMaker, setOfferMaker] = useState("Loading...");
 
+    const [chunkyBlockPresence, setChunkyBlockPresence] = useState({});
+    const [giftBlockPresence, setGiftBlockPresence] = useState({});
+    const [chunkyBlockNumber, setChunkyBlockNumber] = useState(0);
+    const [giftBoxesBlockNumber, setGiftBoxesBlockNumber] = useState(0);
+    const [hasAdjacencyBonus, setHasAdjacencyBonus] = useState(false);
+
+    // Interface animation state
     const [expanded, setExpanded] = useState(false);
-    const [landsListDetails, setLandsListDetails] = useState({});
-    var landNumeration = 1;
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
@@ -66,6 +72,13 @@ function OfferCard(props) {
                         setServiceFee(offerDetails['serviceFee']);
                         setOfferTimestamp(offerDetails['timestamp']);
                         setOfferMaker(offerDetails['offerMaker']);
+                        setHasAdjacencyBonus(calculateAdjacencyBonus(landIdsInOffer));
+                        
+                        // Get info about Othala Chunkies and Gift Boxes presence
+                        setChunkyBlockPresence(getPresences(landIdsInOffer, CHUNKY_LAND_IDS));
+                        setChunkyBlockNumber(getPresencesNumber(landIdsInOffer, chunkyBlockPresence));
+                        setGiftBlockPresence(getPresences(landIdsInOffer, GIFT_LAND_IDS));
+                        setGiftBoxesBlockNumber(getPresencesNumber(landIdsInOffer, giftBlockPresence));
 
                         // Stop refresh updating initialization
                         setIsInitializedWithDetails(true);
@@ -111,6 +124,8 @@ function OfferCard(props) {
                                 <LandListEntry
                                     key={landId}
                                     id={landId}
+                                    isOthalaChunkyPresent={chunkyBlockPresence[landId]}
+                                    isGiftBoxPresent={giftBlockPresence[landId]}
                                 />
                             );
                         })
@@ -132,21 +147,21 @@ function OfferCard(props) {
                     <Box display='flex' flexDirection='column'>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                             <Typography sx={{ mr: 5 }}>
-                                <Box fontWeight='fontWeightMedium' display='inline'> Gifts contained:</Box>
+                                <Box fontWeight='fontWeightMedium' display='inline'> Gifts contained: {giftBoxesBlockNumber}</Box>
                             </Typography>
-                            <DoneOutlineIcon sx={{ ml: 5 }} />
+                            {getPresenceIcon(giftBoxesBlockNumber > 0)}
                         </Box>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                             <Typography sx={{ mr: 5 }}>
-                                <Box fontWeight='fontWeightMedium' display='inline'> Othala chunkies contained:</Box>
+                                <Box fontWeight='fontWeightMedium' display='inline'> Othala chunkies contained: {chunkyBlockNumber}</Box>
                             </Typography>
-                            <DoneOutlineIcon sx={{ ml: 5 }} />
+                            {getPresenceIcon(chunkyBlockNumber > 0)}
                         </Box>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                             <Typography sx={{ mr: 5 }}>
-                                <Box fontWeight='fontWeightMedium' display='inline'> Adjacency bonus:</Box> {hasAdjacencyBonus(landIdsInOffer) + ""}
+                                <Box fontWeight='fontWeightMedium' display='inline'> Adjacency bonus:</Box> {hasAdjacencyBonus ? "Yes" : "No"}
                             </Typography>
-                            <DoneOutlineIcon sx={{ ml: 5 }} />
+                            {getPresenceIcon(hasAdjacencyBonus)}
                         </Box>
                     </Box>
                     <Box display='flex'>
@@ -174,11 +189,10 @@ function getRMRKBlockPrice(landBlockPrice) {
     return price + " RMRK";
 }
 
-
-function hasAdjacencyBonus(landIds) {
+function calculateAdjacencyBonus(landIds) {
 
     if (landIds.length < 9) {
-        return "No";
+        return true;
     }
 
     var hasBonus = false;
@@ -202,7 +216,7 @@ function hasAdjacencyBonus(landIds) {
 
         // We need only one land to have the bonus to end the function
         if (currentHasBonus) {
-            return "Yes";
+            return false;
         }
     }
 
@@ -210,48 +224,30 @@ function hasAdjacencyBonus(landIds) {
 
 }
 
+function getPresences(ids, data) {
 
+    const isPresent = {};
+    for (let i=0; i<ids.length; i++) {
+        const landId = ids[i];
+        isPresent[landId] = data.includes(landId);
+    }
+    return isPresent;
+}
 
+function getPresencesNumber(ids, presences) {
+    var count = 0;
+    for (let i=0; i<ids.length; i++) {
+        if (presences[ids[i]]) {
+            count++;
+        }
+    }
+    return count;
+}
 
-/*
-    /-----------------------/
-    /----- SPIEGAZIONE -----/
-    /-----------------------/
-
-    Dentro il "Collapse", al posto del codice di prova, andrà inserito il MAP prendendo i dati delle land 
-    inserite nell'offerta.
-
-    Ipotizziamo che tra i dati ci siano:
-        -   le coordinate della land (string -> "( X, Y)")
-        -   la rarità (string -> "R")
-
-    Il mapping creerà un Box il cui colore dipenderà dalla rarità della land: bisognerà creare una 
-    funzione "checkRarity(string)" che, presa la rarità della land, restituirà un colore.
-    
-    All'interno del Box ci sarà un Typography che andrà a scrivere il numero cardinale della land 
-    (in ordine di inserimento nell'offerta), seguito dalle coordinate della land e dalla sua rarità.
-
-
-    /------------------/
-    /----- CODICE -----/
-    /------------------/
-
-            {
-              LAND_LIST.map((info) => {
-                return (
-                    <Box display='inline-flex' justifyContent='space-between' 
-                        sx={{ p: 1, backgroundColor: {checkRarity(info.rarity)} }}>
-                        <Typography variant='body2' color='white'>
-                            { landNumeration + " " + info.coordinates}
-                        </Typography>
-                        <Typography variant='body2' color='white'>
-                            {info.rarity}
-                        </Typography>
-                    </Box>
-                )
-              }
-              );
-              landNumeration++;
-            }
-
-*/
+function getPresenceIcon(isPresent) {
+    if (isPresent) {
+        return (<DoneOutlineIcon sx={{ ml: 5 }} />); 
+    } else {
+        return (<ClearOutlinedIcon sx={{ ml: 5 }} />);
+    }
+}

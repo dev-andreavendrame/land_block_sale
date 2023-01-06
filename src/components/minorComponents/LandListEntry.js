@@ -75,17 +75,20 @@ function LandListEntry(props) {
 
 
     return (
-        <Box display='flex' justifyContent='space-between' sx={{ p: 1, backgroundColor: "#ADB5AD"}}>
+        <Box display='flex' justifyContent='space-between' alignItems='center' sx={{ p: 1, backgroundColor: getColorByRarity(plotRarity) }}>
             <Typography variant='body2' color='white'>
                 {getFormattedLandId(landId)}
             </Typography>
             <Typography variant='body2' color='white'>
                 {getRarityByConstants(plotRarity)}
             </Typography>
-            <img width="30" height="30" alt='' src={getImageByRarity(plotRarity)} />
-            {getOthalaChunkyIcon(true)}
-            {getGiftBoxIcon(true)}
-            
+            <Box display='inline-flex' justifyContent='flex-end' sx={{ gap: 0.5 }}>
+                <img width="30" height="30" alt='' src={getImageByRarity(plotRarity)} />
+                <Box display='inline-flex' justifyContent='flex-end' sx={{ gap: 1 }}>
+                    {getOthalaChunkyIcon(true)}
+                    {getGiftBoxIcon(true)}
+                </Box>
+            </Box>
         </Box>
     );
 } export default LandListEntry
@@ -148,7 +151,7 @@ function getColorByRarity(rarityValue) {
     const plotRarity = parseInt(rarityValue);
 
     if (plotRarity === 1) {
-        return "'#ADB5AD";
+        return "#ADB5AD";
     } else if (plotRarity === 2) {
         return "#435FC4";
     } else if (plotRarity === 3) {

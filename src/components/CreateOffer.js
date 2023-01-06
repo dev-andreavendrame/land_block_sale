@@ -105,7 +105,7 @@ function CreateOffer(props) {
 
     return (
         <Box>
-            <Card sx={{ mb: 3, borderRadius: 3, boxShadow: 24, backgroundColor: '#63a9ff' }}>
+            <Card className='blueGradient' sx={{ mb: 3, borderRadius: 3, boxShadow: 24, backgroundColor: '#5BC0F8' }}>
                 <CardContent>
                     <Typography sx={{ mb: 4, ml: 1, fontWeight: 600, fontSize: 26, color: "#282c34", mt: 2 }} variant='h3'>
                         CREATE NEW OFFER

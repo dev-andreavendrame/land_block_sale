@@ -8,7 +8,7 @@ import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Button } from '@mui/material';
 import LandListEntry from './minorComponents/LandListEntry';
 
 // Blockchain imports
@@ -81,14 +81,15 @@ function OfferCard(props) {
 
     return (
         <Card sx={{ mb: 3, maxWidth: 345, borderRadius: 3, boxShadow: 24, }}>
-            <CardHeader
+            <CardHeader className='blueGradient'
                 title={"Offer ID: " + props.id} />
-            <CardContent>
+
+            <CardContent className='lightGreyGradient'>
                 <Typography paragraph>
-                    Price: {getRMRKBlockPrice(blockPrice)}
+                    <Box fontWeight='fontWeightMedium' display='inline'> Price:</Box> {getRMRKBlockPrice(blockPrice)}
                 </Typography>
                 <Typography paragraph>
-                    Total lands contained: {landIdsInOffer.length}
+                    <Box fontWeight='fontWeightMedium' display='inline'> Total lands contained:</Box> {landIdsInOffer.length}
                 </Typography>
                 <Box display='inline-flex' alignItems='center'>
                     <Typography variant='body2' color="text.secondary" >
@@ -103,7 +104,7 @@ function OfferCard(props) {
                         <ExpandMoreIcon />
                     </ExpandMore>
                 </Box>
-                <Collapse in={expanded} timeout="auto" unmountOnExit>
+                <Collapse in={expanded} timeout="auto" >
                     {
                         landIdsInOffer.map((landId) => {
                             return (
@@ -117,27 +118,35 @@ function OfferCard(props) {
                 </Collapse>
             </CardContent>
 
-            <CardActions>
+            <CardActions className='blueGradient'>
                 <Box sx={{ p: 1 }}>
-                    <Typography paragraph>
-                        Created by: {offerMaker}
+                    <Typography >
+                        <Box fontWeight='fontWeightMedium' display='inline'> Created by:&nbsp;</Box>
+                    </Typography>
+                    <Typography paragraph sx={{ fontSize: 12 }}>
+                        {offerMaker}
                     </Typography>
                     <Typography paragraph>
-                        Creator fee: {serviceFee / 10}%
+                        <Box fontWeight='fontWeightMedium' display='inline'>  Creator fee:</Box> {serviceFee / 10}%
                     </Typography>
                     <Box display='flex' flexDirection='column'>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                             <Typography sx={{ mr: 5 }}>
-                                Gifts contained:
+                                <Box fontWeight='fontWeightMedium' display='inline'> Gifts contained:</Box>
                             </Typography>
                             <DoneOutlineIcon sx={{ ml: 5 }} />
                         </Box>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                             <Typography sx={{ mr: 5 }}>
-                                Adjacency bonus: {hasAdjacencyBonus(landIdsInOffer) + ""}
+                                <Box fontWeight='fontWeightMedium' display='inline'> Adjacency bonus:</Box> {hasAdjacencyBonus(landIdsInOffer) + ""}
                             </Typography>
                             <DoneOutlineIcon sx={{ ml: 5 }} />
                         </Box>
+                    </Box>
+                    <Box display='flex'>
+                        <Button className='yellowButton' variant='contained' sx={{ mt: 2, fontWeight: 'bold', color: '#282c34', width: 100 }}>
+                            Buy
+                        </Button>
                     </Box>
                 </Box>
             </CardActions>

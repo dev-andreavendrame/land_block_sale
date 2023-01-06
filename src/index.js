@@ -4,16 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 // Graphql Client
-import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, from } from '@apollo/client';
-import { onError } from '@apollo/client/link/error';
-
-const errorLink = onError(({ graphqlErrors, networkError }) => {
-  if (graphqlErrors) {
-    graphqlErrors.map(({ message, location, path }) => {
-      alert('Graphql error ${message} ');
-    });
-  }
-});
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
 
 export const subsquidClient = new ApolloClient({
   cache: new InMemoryCache(),

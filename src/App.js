@@ -8,7 +8,6 @@ import MButton from '@mui/material/Button';
 import { readLandBlockSC, landBlockCA, smartContractXCRMRK } from './components/LandBlockSale';
 import CreateOffer from './components/CreateOffer';
 import WithdrawComponent from './components/WithdrawComponent';
-import Block from './components/Block';
 import MyOffers from './components/MyOffers';
 
 import SRSlogo from './components/images/SRS_logo.png';
@@ -182,12 +181,6 @@ function App() {
         </div>
 
 
-        
-        <div>
-          {actualActiveOffers.map(offerId => (
-            <Block offer_id={offerId} key={offerId} />
-          ))}
-        </div>
         <WithdrawComponent key={currentAccount} connected_account={currentAccount} />
         <div class="mt-5 pt-5 pb-5 footer">
           <div class="box_container_padded">

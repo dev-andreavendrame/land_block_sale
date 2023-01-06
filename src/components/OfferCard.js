@@ -138,6 +138,12 @@ function OfferCard(props) {
                         </Box>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                             <Typography sx={{ mr: 5 }}>
+                                <Box fontWeight='fontWeightMedium' display='inline'> Othala chunkies contained:</Box>
+                            </Typography>
+                            <DoneOutlineIcon sx={{ ml: 5 }} />
+                        </Box>
+                        <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+                            <Typography sx={{ mr: 5 }}>
                                 <Box fontWeight='fontWeightMedium' display='inline'> Adjacency bonus:</Box> {hasAdjacencyBonus(landIdsInOffer) + ""}
                             </Typography>
                             <DoneOutlineIcon sx={{ ml: 5 }} />
@@ -172,7 +178,7 @@ function getRMRKBlockPrice(landBlockPrice) {
 function hasAdjacencyBonus(landIds) {
 
     if (landIds.length < 9) {
-        return false;
+        return "No";
     }
 
     var hasBonus = false;
@@ -196,7 +202,7 @@ function hasAdjacencyBonus(landIds) {
 
         // We need only one land to have the bonus to end the function
         if (currentHasBonus) {
-            return true;
+            return "Yes";
         }
     }
 

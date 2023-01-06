@@ -14,6 +14,8 @@ import img_rarity_rare from '../images/rarityRare.png';
 import img_rarity_epic from '../images/rarityEpic.png';
 import img_rarity_harb from '../images/rarityHarb.png';
 import img_rarity_premium from '../images/rarityPremium.png';
+import img_gift_box from '../images/gift-with_border.png';
+import img_othala_chunky from '../images/othalachunky-with-border.png';
 
 function LandListEntry(props) {
 
@@ -73,17 +75,32 @@ function LandListEntry(props) {
 
 
     return (
-        <Box display='flex' justifyContent='space-between' sx={{ p: 1, backgroundColor: 'blue' }}>
+        <Box display='flex' justifyContent='space-between' sx={{ p: 1, backgroundColor: "#ADB5AD"}}>
             <Typography variant='body2' color='white'>
                 {getFormattedLandId(landId)}
             </Typography>
             <Typography variant='body2' color='white'>
                 {getRarityByConstants(plotRarity)}
             </Typography>
-            <img width="30" height="30" src={getImageByRarity(plotRarity)} />
+            <img width="30" height="30" alt='' src={getImageByRarity(plotRarity)} />
+            {getOthalaChunkyIcon(true)}
+            {getGiftBoxIcon(true)}
+            
         </Box>
     );
 } export default LandListEntry
+
+function getOthalaChunkyIcon(isPresent) {
+    if (isPresent) {
+        return (<img width="30" height="30" alt='othala chunky icon' src={img_othala_chunky} />);
+    }
+}
+
+function getGiftBoxIcon(isPresent) {
+    if (isPresent) {
+        return (<img width="30" height="30" alt='gift box icon' src={img_gift_box} />);
+    }
+}
 
 
 function getFormattedLandId(landId) {
@@ -93,7 +110,9 @@ function getFormattedLandId(landId) {
 }
 
 function getRarityByConstants(rarityValue) {
+
     const plotRarity = parseInt(rarityValue);
+
     if (plotRarity === 1) {
         return "Common";
     } else if (plotRarity === 2) {
@@ -108,7 +127,9 @@ function getRarityByConstants(rarityValue) {
 }
 
 function getImageByRarity(rarityValue) {
+
     const plotRarity = parseInt(rarityValue);
+
     if (plotRarity === 1) {
         return img_rarity_common;
     } else if (plotRarity === 2) {
@@ -120,4 +141,22 @@ function getImageByRarity(rarityValue) {
     } else {
         return img_rarity_harb;
     }
+}
+
+function getColorByRarity(rarityValue) {
+
+    const plotRarity = parseInt(rarityValue);
+
+    if (plotRarity === 1) {
+        return "'#ADB5AD";
+    } else if (plotRarity === 2) {
+        return "#435FC4";
+    } else if (plotRarity === 3) {
+        return "#7346C4";
+    } else if (plotRarity === 5) {
+        return "#CF8441";
+    } else {
+        return "#9D265C";
+    }
+
 }

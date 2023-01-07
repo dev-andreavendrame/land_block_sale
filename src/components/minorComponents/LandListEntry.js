@@ -20,6 +20,8 @@ import img_othala_chunky from '../images/othalachunky-with-border.png';
 function LandListEntry(props) {
 
     const landId = props.id;
+    const othalaChunkyPresent = props.isOthalaChunkyPresent;
+    const giftBoxPresent = props.isGiftBoxPresent;
     const [landRetrievedDetails, setLandRetrievedDetails] = useState(null);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     // Land details
@@ -82,13 +84,10 @@ function LandListEntry(props) {
             <Typography variant='body2' color='white'>
                 {getRarityByConstants(plotRarity)}
             </Typography>
-            <Box display='inline-flex' justifyContent='flex-end' sx={{ gap: 0.5 }}>
-                <img width="30" height="30" alt='' src={getImageByRarity(plotRarity)} />
-                <Box display='inline-flex' justifyContent='flex-end' sx={{ gap: 1 }}>
-                    {getOthalaChunkyIcon(true)}
-                    {getGiftBoxIcon(true)}
-                </Box>
-            </Box>
+            <img width="30" height="30" alt='' src={getImageByRarity(plotRarity)} />
+            {getOthalaChunkyIcon(true)}
+            {getGiftBoxIcon(true)}
+            
         </Box>
     );
 } export default LandListEntry

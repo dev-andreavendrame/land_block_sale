@@ -84,10 +84,13 @@ function LandListEntry(props) {
             <Typography variant='body2' color='white'>
                 {getRarityByConstants(plotRarity)}
             </Typography>
-            <img width="30" height="30" alt='' src={getImageByRarity(plotRarity)} />
-            {getOthalaChunkyIcon(true)}
-            {getGiftBoxIcon(true)}
-            
+            <Box display='inline-flex' justifyContent='flex-end' sx={{ gap: 0.5 }}>
+                <img width="30" height="30" alt='' src={getImageByRarity(plotRarity)} />
+                <Box display='inline-flex' justifyContent='flex-end' sx={{ gap: 1 }}>
+                    {getOthalaChunkyIcon(othalaChunkyPresent)}
+                    {getGiftBoxIcon(giftBoxPresent)}
+                </Box>
+            </Box>
         </Box>
     );
 } export default LandListEntry

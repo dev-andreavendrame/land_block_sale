@@ -14,38 +14,16 @@ import SRSlogo from './components/images/SRS_logo.png';
 import OfferCard from './components/OfferCard';
 
 // New imports
-import { landBlockSalesReadable } from './components/smartContracts/MoonriverConfig.js';
+
+import HandleOffers from './components/HandleOffers';
 
 function App() {
 
-  const [actualActiveOffers, setActualActiveOffers] = useState([]);
+  
   const [currentAccount, setCurrentAccount] = useState("");
   var activeOffersNumber = useRef(-1);
 
-  function handleClickBackup() {
-
-    readLandBlockSC.getActiveOffers().then(offerIds => {
-      setActualActiveOffers(offerIds);
-      // Change state
-      activeOffersNumber = offerIds.length;
-      console.log("IDs offerte ricevute: " + offerIds);
-    }).catch(error => {
-      console.log("Errore: " + error);
-      setActualActiveOffers([]);
-    });
-  }
-
-  function handleClick() {
-    landBlockSalesReadable.getActiveOffers()
-    .then((offerIds) => {
-      console.log("Offerte con la nuova configurazione: [" + offerIds + "]");
-      setActualActiveOffers(offerIds);
-    }).catch(error => {
-      console.log("Errore handleClick");
-      console.log(error);
-      setActualActiveOffers([]);
-    })
-  }
+  
 
 
 
@@ -152,33 +130,20 @@ function App() {
 
 
       <div class="mt-5 container">
-        <CreateOffer create_offer={0} />
+        <CreateOffer create_offer={0}/>
 
-        {actualActiveOffers.map(offerId => (
-            <OfferCard id={offerId} key={offerId} />
-          ))}
+
+        <HandleOffers 
+          wallet={currentAccount}
+          />
 
         
 
-        <MyOffers connected_wallet={currentAccount} />
 
 
 
 
 
-
-
-
-
-
-        <div class="card bg-info">
-          <div class="card-body">
-            <h3 class="card-title">Market offers</h3>
-            <div class="col d-flex justify-content-center btn-block">
-              <button type="button" class="btn btn-warning col-12" onClick={handleClick}>Get active offers</button>
-            </div>
-          </div>
-        </div>
 
 
         <WithdrawComponent key={currentAccount} connected_account={currentAccount} />

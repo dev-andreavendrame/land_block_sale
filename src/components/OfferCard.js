@@ -147,13 +147,13 @@ function OfferCard(props) {
                     <Box display='flex' flexDirection='column'>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                             <Typography sx={{ mr: 5 }}>
-                                <Box fontWeight='fontWeightMedium' display='inline'> Gifts contained: {giftBoxesBlockNumber}</Box>
+                                <Box fontWeight='fontWeightMedium' display='inline'> Gifts contained: </Box> {giftBoxesBlockNumber}
                             </Typography>
                             {getPresenceIcon(giftBoxesBlockNumber > 0)}
                         </Box>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-                            <Typography sx={{ mr: 5 }}>
-                                <Box fontWeight='fontWeightMedium' display='inline'> Othala chunkies contained: {chunkyBlockNumber}</Box>
+                            <Typography sx={{ mr: 5 }} noWrap>
+                                <Box fontWeight='fontWeightMedium' display='inline'> Othala chunkies contained: </Box> {chunkyBlockNumber}
                             </Typography>
                             {getPresenceIcon(chunkyBlockNumber > 0)}
                         </Box>
@@ -174,6 +174,16 @@ function OfferCard(props) {
         </Card >
     );
 } export default OfferCard;
+
+/*  variante button 
+
+    <Box display='flex' justifyContent='flex-end'>
+        <Button sx={{ mt: 2, fontWeight: 'bold', color: 'red', width: 100 }}>
+            Withdraw
+        </Button>
+    </Box>
+
+*/
 
 
 function decodeLandIdsFromCall(encodedIds) {

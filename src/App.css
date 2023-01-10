@@ -161,6 +161,23 @@
 }
 
 
+.blueGradientText {
+  background: linear-gradient(0deg, #209de0, #86E5FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.blueGradientButton {
+  background-image: linear-gradient(to top, #209de0, #86E5FF) !important;
+  transition: all .2s ease-in-out !important;
+}
+.blueGradientButton:hover {
+  transform: scale(1.1);
+}
+
+
+
 /*
 
   /-------------------------/

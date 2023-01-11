@@ -52,7 +52,10 @@ function HandleOffers(props) {
                     </Button>
                 </Box>
                 {actualActiveOffers.map(offerId => (
-                    <OfferCard id={offerId} key={offerId} />
+                    <OfferCard 
+                    id={offerId} 
+                    key={offerId}
+                    isMyOffer={true} />
                 ))}
 
                 <Box display='flex' alignItems='center' sx={{ mt: 5 }}>

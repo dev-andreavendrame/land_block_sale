@@ -33,6 +33,7 @@ function OfferCard(props) {
 
     // Parent passed values
     const currentOfferId = props.id;
+    const isThisOfferMine = props.isMyOffer;
 
     // Component state variables
     const [offerDetails, setOfferDetails] = useState(null);
@@ -73,7 +74,7 @@ function OfferCard(props) {
                         setOfferTimestamp(offerDetails['timestamp']);
                         setOfferMaker(offerDetails['offerMaker']);
                         setHasAdjacencyBonus(calculateAdjacencyBonus(landIdsInOffer));
-                        
+
                         // Get info about Othala Chunkies and Gift Boxes presence
                         setChunkyBlockPresence(getPresences(landIdsInOffer, CHUNKY_LAND_IDS));
                         setChunkyBlockNumber(getPresencesNumber(landIdsInOffer, chunkyBlockPresence));
@@ -164,26 +165,23 @@ function OfferCard(props) {
                             {getPresenceIcon(hasAdjacencyBonus)}
                         </Box>
                     </Box>
-                    <Box display='flex'>
-                        <Button className='yellowButton' variant='contained' sx={{ mt: 2, fontWeight: 'bold', color: '#282c34', width: 100 }}>
-                            Buy
-                        </Button>
-                    </Box>
+                    {isThisOfferMine ?
+                        <Box display='flex' justifyContent='flex-end'>
+                            <Button variant='outlined' sx={{ mt: 2, fontWeight: 'bold', color: 'white', backgroundColor: 'red', width: 100 }}>
+                                Withdraw
+                            </Button>
+                        </Box> :
+                        <Box display='flex'>
+                            <Button className='yellowButton' variant='contained' sx={{ mt: 2, fontWeight: 'bold', color: '#282c34', width: 100 }}>
+                                Buy
+                            </Button>
+                        </Box>
+                    }
                 </Box>
             </CardActions>
         </Card >
     );
 } export default OfferCard;
-
-/*  variante button 
-
-    <Box display='flex' justifyContent='flex-end'>
-        <Button sx={{ mt: 2, fontWeight: 'bold', color: 'red', width: 100 }}>
-            Withdraw
-        </Button>
-    </Box>
-
-*/
 
 
 function decodeLandIdsFromCall(encodedIds) {
@@ -237,7 +235,7 @@ function calculateAdjacencyBonus(landIds) {
 function getPresences(ids, data) {
 
     const isPresent = {};
-    for (let i=0; i<ids.length; i++) {
+    for (let i = 0; i < ids.length; i++) {
         const landId = ids[i];
         isPresent[landId] = data.includes(landId);
     }
@@ -246,7 +244,7 @@ function getPresences(ids, data) {
 
 function getPresencesNumber(ids, presences) {
     var count = 0;
-    for (let i=0; i<ids.length; i++) {
+    for (let i = 0; i < ids.length; i++) {
         if (presences[ids[i]]) {
             count++;
         }
@@ -256,7 +254,7 @@ function getPresencesNumber(ids, presences) {
 
 function getPresenceIcon(isPresent) {
     if (isPresent) {
-        return (<DoneOutlineIcon sx={{ ml: 5 }} />); 
+        return (<DoneOutlineIcon sx={{ ml: 5 }} />);
     } else {
         return (<ClearOutlinedIcon sx={{ ml: 5 }} />);
     }

@@ -16,6 +16,7 @@ import OfferCard from './components/OfferCard';
 // New imports
 
 import HandleOffers from './components/HandleOffers';
+import DepositedLandCard from './components/DepositedLandCard';
 
 function App() {
 
@@ -137,7 +138,7 @@ function App() {
           wallet={currentAccount}
           />
 
-        
+        <DepositedLandCard />
 
 
 

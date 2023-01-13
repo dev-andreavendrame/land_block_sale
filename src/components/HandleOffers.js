@@ -1,17 +1,15 @@
 import { React, useEffect, useState } from 'react';
 import { landBlockSalesReadable } from './smartContracts/MoonriverConfig.js';
 import OfferCard from './OfferCard';
-import { Typography, Box, Button } from '@mui/material';
-
-// IMPORTANT!   =>  This class will replace the "Market offer" section created in App.js
-//                    
-//
-//                  As consequences, lots of testing must be made to be sure everything works fine !!!
+import { Typography, Box, Button, IconButton } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 function HandleOffers(props) {
 
     const userWallet = props.wallet;
     const [actualActiveOffers, setActualActiveOffers] = useState([]);
+    const [myButton, setMyButton] = useState(false);
+    const [marketButton, setMarketButton] = useState(false);
 
     function fetchMarketActiveOffers() {
         landBlockSalesReadable.getActiveOffers()
@@ -22,7 +20,8 @@ function HandleOffers(props) {
                 console.log("Errore handleClick");
                 console.log(error);
                 setActualActiveOffers([]);
-            })
+            });
+        if (!marketButton) { setMarketButton(true) };
     }
 
     function fetchMyActiveOffers() {
@@ -34,12 +33,10 @@ function HandleOffers(props) {
                 console.log("Errore handleClick");
                 console.log(error);
                 setActualActiveOffers([]);
-            })
+            });
+        if (!myButton) { setMyButton(true) };
     }
 
-
-
-    // RE-DO ALL !!!!!
     return (
         <Box>
             <Box sx={{ mt: 5 }}>
@@ -47,24 +44,36 @@ function HandleOffers(props) {
                     <Typography className='blueGradientText' sx={{ mr: 5, fontSize: 60, fontWeight: 1000 }}>
                         Active Market Offers
                     </Typography>
-                    <Button className='blueGradientButton' variant='contained' size='large' onClick={fetchMarketActiveOffers} sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
-                        Check
-                    </Button>
+                    {marketButton ?
+                        <IconButton className='blueGradientButton' variant='contained' size='large' onClick={fetchMarketActiveOffers} sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
+                            <RefreshIcon sx={{ color: 'white' }} />
+                        </IconButton>
+                        :
+                        <Button className='blueGradientButton' variant='contained' size='large' onClick={fetchMarketActiveOffers} sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
+                            Check
+                        </Button>
+                    }
                 </Box>
                 {actualActiveOffers.map(offerId => (
-                    <OfferCard 
-                    id={offerId} 
-                    key={offerId}
-                    isMyOffer={true} />
+                    <OfferCard
+                        id={offerId}
+                        key={offerId}
+                        isMyOffer={true} />
                 ))}
 
                 <Box display='flex' alignItems='center' sx={{ mt: 5 }}>
                     <Typography className='blueGradientText' sx={{ mr: 5, fontSize: 60, fontWeight: 1000 }}>
                         My Offers
                     </Typography>
-                    <Button className='blueGradientButton' variant='contained' size='large' sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
-                        Check
-                    </Button>
+                    {myButton ?
+                        <IconButton className='blueGradientButton' variant='contained' size='large' sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
+                            <RefreshIcon sx={{ color: 'white' }} />
+                        </IconButton>
+                        :
+                        <Button className='blueGradientButton' variant='contained' size='large' sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
+                            Check
+                        </Button>
+                    }
                 </Box>
             </Box>
 

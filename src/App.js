@@ -18,15 +18,14 @@ import OfferCard from './components/OfferCard';
 import HandleOffers from './components/HandleOffers';
 import DepositedLandCard from './components/DepositedLandCard';
 
+//added react router for more pages
+import {BrowserRouter,Routes,Route, Link} from 'react-router-dom';
+
 function App() {
 
   
   const [currentAccount, setCurrentAccount] = useState("");
   var activeOffersNumber = useRef(-1);
-
-  
-
-
 
 
   // Metamask button
@@ -94,6 +93,8 @@ function App() {
   }, []);
 
   return (
+    <BrowserRouter>
+
     <div className="App" class="bg" >
 
       <AppBar position="static" sx={{ height: 130, backgroundColor: "#282c34", boxShadow: 24 }}>
@@ -125,29 +126,38 @@ function App() {
         </Box>
       </AppBar>
 
+      <Routes >
 
+      <Route exact path='/' element= {
+            <>
+            <h1>
+              Home Page
+            </h1>
+            <div>
+            <Link to={'/Offermarket' }> OfferMarket</Link>
+            </div>
+            <div>
+            <Link to={'/Landmanagement'}> LandManagement</Link>
+            </div>
+          </>
+      }/>
 
+      <Route exact path='/Offermarket' element= {
+        <div class="mt-5 container">
+          <HandleOffers wallet={currentAccount}/>
+          <DepositedLandCard />
+        </div>
+      }/>
 
+      <Route exact path='/Landmanagement' element= {
+        <div class="mt-5 container">
+          <CreateOffer create_offer={0}/>
+          <WithdrawComponent key={currentAccount} connected_account={currentAccount} />
+        </div>
+      }/>
 
+      </Routes>
 
-      <div class="mt-5 container">
-        <CreateOffer create_offer={0}/>
-
-
-        <HandleOffers 
-          wallet={currentAccount}
-          />
-
-        <DepositedLandCard />
-
-
-
-
-
-
-
-
-        <WithdrawComponent key={currentAccount} connected_account={currentAccount} />
         <div class="mt-5 pt-5 pb-5 footer">
           <div class="box_container_padded">
             <div class="d-flex justify-content-end">
@@ -182,9 +192,9 @@ function App() {
             </div>
           </div>
         </div>
-      </div>
     </div>
 
+    </BrowserRouter>
   );
 
 

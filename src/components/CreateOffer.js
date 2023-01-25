@@ -1,15 +1,26 @@
-import { React, useEffect, useState, useRef } from 'react';
+import { ethers } from "ethers";
 import { writeLandBlockSC, landBlockCA, readLandBlockSC, smartContractSkybreach } from './LandBlockSale';
 
-import { ethers } from "ethers";
-import { Card, CardContent, Typography, Box, Grid, TextField, Button, CardActions } from '@mui/material';
+import { React, useEffect, useState, useRef } from 'react';
+import { styled } from '@mui/material/styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Card, Collapse, CardContent, Typography, Box, Grid, TextField, Button, CardActions, IconButton } from '@mui/material';
+
+const ExpandMore = styled((props) => {
+    const { expand, ...other } = props;
+    return <IconButton {...other} />;
+})(({ theme, expand }) => ({
+    transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
+        duration: theme.transitions.duration.shortest,
+    }),
+}));
 
 function CreateOffer(props) {
 
     // Offer details
-    const [landIdsInOffer, setLandIdsInOffer] = useState([]);
     const [blockPrice, setBlockPrice] = useState(-1);
-    const [landsToSellIds, setLandsToSellIds] = useState([]);
     const [serviceFee, setServiceFee] = useState(null);
 
     const [declareDepositButtonState, setDeclareDepositButtonState] = useState(false);
@@ -20,22 +31,87 @@ function CreateOffer(props) {
     // Offer data
     const inputLandIdsRef = useRef(null);
     const inputPriceRef = useRef(null);
+    const [currentOfferCoordinates, setCurrentOfferCoordinates] = useState([]);
+
+    const [landXValue, setLandXValue] = useState(0);
+    const [landYValue, setLandYValue] = useState(0);
+
+    // Interface animation state
+    const [expanded, setExpanded] = useState(false);
+
+    const handleExpandClick = () => {
+        setExpanded(!expanded);
+    };
+
 
     useEffect(() => {
 
-        getCurrentServiceFee();
+        if (serviceFee == null) {
+            getCurrentServiceFee();
+        }
 
     }, [serviceFee]);
 
-    if (serviceFee == null) {
-        getCurrentServiceFee();
+    const addLandToList = () => {
+
+        console.log("X: %d, Y: %d", landXValue, landYValue);
+
+        if (!checkCoordinatesAlreadyIn(landXValue, landYValue, currentOfferCoordinates)) {
+            // Coordinates not already inserted
+            const updatedCoords = currentOfferCoordinates;
+            updatedCoords.push({ x: landXValue, y: landYValue });
+            setCurrentOfferCoordinates(updatedCoords);
+            console.log(currentOfferCoordinates);
+        } else {
+            console.log("Coordinates already inserted in the land list!");
+            // SHOW WARNING POPUP
+        }
     }
 
+    const removeLandFromList = () => {
+
+        const landXToRemove = landXValue;
+        const landYToRemove = landYValue;
+
+        var indexToRemove = -1;
+        let updatedCoordinates = [];
+
+        for (let i = 0; i < currentOfferCoordinates.length; i++) {
+            const currentX = currentOfferCoordinates[i]['x'];
+            const currentY = currentOfferCoordinates[i]['y'];
+
+            if (currentX === landXToRemove && currentY === landYToRemove) {
+                indexToRemove = i;
+            } else {
+                updatedCoordinates.push({ x: currentX, y: currentY });
+            }
+        }
+
+        if (indexToRemove === -1) {
+            console.log("Land to remove not found!");
+            // MOSTRARE POPUP NOT FOUND (WARNING)
+        } else {
+            console.log("Land removed!");
+            // MOSTRARE POPUP LAND REMOVED (SUCCESS)
+            console.log("Removed land at %d index", indexToRemove);
+            setCurrentOfferCoordinates(updatedCoordinates);
+        }
+
+    }
+
+    const handleXChange = event => {
+        setLandXValue(parseInt(event.target.value));
+        console.log('value is:', event.target.value);
+    };
+    const handleYChange = event => {
+        setLandYValue(parseInt(event.target.value));
+        console.log('value is:', event.target.value);
+    };
 
 
     function createOffer() {
 
-        var landIds = decodeOfferLands(inputLandIdsRef.current.value);
+        var landIds = decodeOfferLands(currentOfferCoordinates);
         var blockPrice = getEffectiveBlockPrice(inputPriceRef.current.value);
         console.log("Land ids: " + landIds + " offer price: " + blockPrice + " RMRK");
         // Execute transactions
@@ -43,7 +119,7 @@ function CreateOffer(props) {
     }
 
     function declareBatchDeposit() {
-        var landIds = decodeOfferLands(inputLandIdsRef.current.value);
+        var landIds = decodeOfferLands(currentOfferCoordinates);
         writeLandBlockSC.declareBatchLandDeposit(landIds)
             .then(depositBatchResult => {
                 console.log("Deposit batch result: " + depositBatchResult);
@@ -52,10 +128,11 @@ function CreateOffer(props) {
                 console.log("land: " + landIds);
                 console.log("Deposit batch error: " + error);
             });
+
     }
 
     function confirmBatchDeposit() {
-        var landIds = decodeOfferLands(inputLandIdsRef.current.value);
+        var landIds = decodeOfferLands(currentOfferCoordinates);
         writeLandBlockSC.confirmBatchLandDeposit(landIds)
             .then(depositResult => {
                 console.log("Deposit result" + depositResult);
@@ -66,7 +143,7 @@ function CreateOffer(props) {
     }
 
     function sendLands() {
-        var landIds = decodeOfferLands(inputLandIdsRef.current.value);
+        var landIds = decodeOfferLands(currentOfferCoordinates);
         var sendLandPromises = [];
         for (let i = 0; i < landIds.length; i++) {
             sendLandPromises.push(smartContractSkybreach.transfer(landIds[i], landBlockCA));
@@ -107,6 +184,30 @@ function CreateOffer(props) {
         <Box>
             <Card className='blueGradient' sx={{ mb: 3, borderRadius: 3, boxShadow: 24, backgroundColor: '#5BC0F8' }}>
                 <CardContent>
+                    <Box display='inline-flex' alignItems='center'>
+                        <Typography variant='body2' color="text.secondary" >
+                            Lands list:
+                        </Typography>
+                        <ExpandMore
+                            expand={expanded}
+                            onClick={handleExpandClick}
+                            aria-expanded={expanded}
+                            aria-label="show more"
+                        >
+                            <ExpandMoreIcon />
+                        </ExpandMore>
+                    </Box>
+                    <Collapse in={expanded} timeout="auto" >
+                        {
+                            currentOfferCoordinates.map((coordinates) => {
+                                return (
+                                    <Typography variant='h6' color='#555555' >
+                                        {"X: " + coordinates['x'] + ", Y: " + coordinates['y']}
+                                    </Typography>
+                                );
+                            })
+                        }
+                    </Collapse>
                     <Typography sx={{ mb: 4, ml: 1, fontWeight: 600, fontSize: 26, color: "#282c34", mt: 2 }} variant='h3'>
                         CREATE NEW OFFER
                     </Typography>
@@ -126,7 +227,8 @@ function CreateOffer(props) {
                                     required
                                     id="x_coordinate"
                                     name="x_coordinate"
-                                    onChange={inputLandIdsRef}
+                                    onChange={handleXChange}
+                                    value={landXValue}
                                     placeholder="X"
                                 />
                             </Grid>
@@ -138,23 +240,21 @@ function CreateOffer(props) {
                                     required
                                     id="y_coordinate"
                                     name="y_coordinate"
-                                    onChange={inputLandIdsRef}
+                                    onChange={handleYChange}
+                                    value={landYValue}
                                     placeholder="Y"
                                 />
                             </Grid>
                             <Grid item xs={4}>
-                                <Button className='yellowButton' variant='contained' sx={{ fontWeight: 'bold', color: '#282c34' }}>
+                                <Button onClick={addLandToList} className='yellowButton' variant='contained' sx={{ fontWeight: 'bold', color: '#282c34' }}>
                                     Add
                                 </Button>
                             </Grid>
-                        </Grid>
-
-                        <Grid item xs={7}>
-                            <Box sx={{ ml: 4 }}>
-                                <Typography variant='h6' color='#555555' >
-                                    Lands:
-                                </Typography>
-                            </Box>
+                            <Grid item xs={4}>
+                                <Button onClick={removeLandFromList} className='redButton' variant='contained' sx={{ fontWeight: 'bold', color: '#282c34' }}>
+                                    Remove
+                                </Button>
+                            </Grid>
                         </Grid>
                     </Grid>
 
@@ -192,7 +292,7 @@ function CreateOffer(props) {
                 <CardActions>
                     <Grid container direction='row' spacing={2} alignItems='center' sx={{ ml: 2, mt: 0, mb: 2 }}>
                         <Grid item xs={1.4}>
-                            <Button className='yellowButton' disabled={!declareDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 2 }}>
+                            <Button onClick={declareBatchDeposit} className='yellowButton' disabled={declareDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 2 }}>
                                 Declare deposit
                             </Button>
                         </Grid>
@@ -209,7 +309,7 @@ function CreateOffer(props) {
                         <Grid item xs={1.2}>
                         </Grid>
                         <Grid item xs={1.5}>
-                            <Button className='redWhiteButton' disabled={!createOfferButtonState} variant='outlined' size='medium' sx={{ fontWeight: 600, backgroundColor: '#cf2020', width: 100, height: 70, borderRadius: 3, border: '4px solid',}}>
+                            <Button className='redWhiteButton' disabled={!createOfferButtonState} variant='outlined' size='medium' sx={{ fontWeight: 600, backgroundColor: '#cf2020', width: 100, height: 70, borderRadius: 3, border: '4px solid', }}>
                                 Create offer
                             </Button>
                         </Grid>
@@ -222,37 +322,35 @@ function CreateOffer(props) {
 
 } export default CreateOffer;
 
+function checkCoordinatesAlreadyIn(currentX, currentY, currentCoordinates) {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function decodeOfferLands(rawText) {
-
-    // Example of land encoding --> (122,12) & (122,13)
-
-    var text = rawText.replaceAll(" ", ""); // Remove spaces
-    const rawArray = text.split("&");    // Split by land coordinates
-    var landsIds = [];
-    for (let i = 0; i < rawArray.length; i++) {
-        var landCoordinates = rawArray[i].replaceAll("(", "").replaceAll(")", "");
-        var coordinates = landCoordinates.split(",");
-        landsIds.push(parseInt(coordinates[0]) + parseInt(coordinates[1] * 256));
+    const coordinatesIn = currentCoordinates.length;
+    for (let i = 0; i < coordinatesIn; i++) {
+        if (currentCoordinates[i]['x'] === currentX && currentCoordinates[i]['y'] === currentY) {
+            return true;
+        }
     }
-    return landsIds;
+
+    return false;
+}
+
+function decodeOfferLands(currentCoordinates) {
+
+    let landIds = [];
+
+    for (let i = 0; i < currentCoordinates.length; i++) {
+        const currentX = currentCoordinates[i]['x'];
+        const currentY = currentCoordinates[i]['y'];
+
+        console.log("X: %d, Y: %d", currentX, currentY);
+
+        const landId = currentX + currentY * 256;
+        landIds.push(landId);
+    }
+
+    console.log("Lands inserted in the offer: %d", landIds.length);
+
+    return landIds;
 }
 
 function getEffectiveBlockPrice(rawPrice) {

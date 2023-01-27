@@ -168,7 +168,7 @@ function OfferCard(props) {
                     {isThisOfferMine ?
                         <Box display='flex' justifyContent='flex-end'>
                             <Button className='discardButton' variant='outlined' sx={{ mt: 2, fontWeight: 'bold', color: 'red', width: 100, borderRadius: 2 }}>
-                                Withdraw
+                                Cancel
                             </Button>
                         </Box> :
                         <Box display='flex'>

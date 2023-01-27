@@ -1,7 +1,7 @@
 import { React, useEffect, useState } from 'react';
 import { landBlockSalesReadable } from './smartContracts/MoonriverConfig.js';
 import OfferCard from './OfferCard';
-import { Typography, Box, Button, IconButton } from '@mui/material';
+import { Typography, Box, Button, IconButton, Grid } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 function HandleOffers(props) {
@@ -54,13 +54,28 @@ function HandleOffers(props) {
                         </Button>
                     }
                 </Box>
-                {actualActiveOffers.map(offerId => (
-                    <OfferCard
-                        id={offerId}
-                        key={offerId}
-                        isMyOffer={true} />
-                ))}
+                <Grid container spacing={5} direction="row" justifyContent="flex-start" alignItems="flex-start" sx={{ mb: 1 }}>
+                    {actualActiveOffers.map(offerId => (
+                        <Grid item xs='auto'>
+                            <OfferCard
+                                id={offerId}
+                                key={offerId}
+                                isMyOffer={true} />
+                        </Grid>
+                    ))}
+                </Grid>
 
+
+            </Box>
+
+        </Box>
+    );
+
+} export default HandleOffers;
+
+
+// MY OFFERS section, to add in the future under the map of MARKET OFFERS
+/*
                 <Box display='flex' alignItems='center' sx={{ mt: 5 }}>
                     <Typography className='blueGradientText' sx={{ mr: 5, fontSize: 60, fontWeight: 1000 }}>
                         My Offers
@@ -75,9 +90,4 @@ function HandleOffers(props) {
                         </Button>
                     }
                 </Box>
-            </Box>
-
-        </Box>
-    );
-
-} export default HandleOffers;
+*/

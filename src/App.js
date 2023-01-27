@@ -19,8 +19,8 @@ import HandleOffers from './components/HandleOffers';
 import DepositedLandCard from './components/DepositedLandCard';
 
 //added react router for more pages
-import { BrowserRouter, Routes, Route, Link, useLocation, redirect  } from 'react-router-dom';
-
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
 
@@ -112,7 +112,7 @@ function App() {
 
     );
   }
-  
+
 
   // Metamask button
   const connectWallet = async () => {
@@ -130,10 +130,8 @@ function App() {
       if (accounts.length !== 0) {
         setCurrentAccount(accounts[0]);
         console.log("Account 0: " + accounts[0]);
-        redirect('/Landmanagement');
       } else {
         console.log("0 account connected to Metamask extension");
-        
       }
     } catch {
       console.log("Error during Metamask connection");
@@ -189,6 +187,12 @@ function App() {
     fontSize: 20
   };
 
+  const homeLinkStyle = {
+    textDecoration: "none",
+    color: 'white',
+    fontWeight: '800',
+    fontSize: 30
+  };
 
   return (
     <BrowserRouter>
@@ -198,22 +202,29 @@ function App() {
         <Routes >
 
           <Route exact path='/' element={
-            <Box className='partialPage' display='flex' justifyContent='center' alignItems='center'>
+            <Box className='fullPage' display='flex' justifyContent='center' alignItems='center' sx={{ p: 5 }}>
               <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center' >
-                <Box sx={{ maxWidth: 350 }}>
+                <Box sx={{ maxWidth: 200 }}>
                   <img src={SRSlogo} alt="Superrisk Studio logo" class='img-fluid' />
                 </Box>
-                <Typography className='blueGradientText' sx={{ fontSize: 130, fontWeight: 1000 }}>
+                <Typography className='blueGradientText' sx={{ fontSize: 100, fontWeight: 1000 }}>
                   SKYBREACH TOOLS
                 </Typography>
-                <Typography className='blueGradientText' sx={{ mt: -4, fontSize: 80, fontWeight: 1000 }}>
+                <Typography className='blueGradientText' sx={{ mt: -4, fontSize: 60, fontWeight: 1000 }}>
                   Land-block Sale
                 </Typography>
-                <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{mt: 5, width: 400, height: 150, borderRadius: 50 }} onClick={connectWallet}>
-                  <Typography sx={{ color: 'white', fontWeight: '800', fontSize: 40}}>
-                    Connect&nbsp; wallet
-                  </Typography>
-                </Button>
+                <Box display='flex' gap={5} alignItems='center'>
+                  <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 350, height: 130, borderRadius: 50 }} onClick={connectWallet}>
+                    <Typography sx={{ color: 'white', fontWeight: '800', fontSize: 30 }}>
+                      Connect&nbsp; wallet
+                    </Typography>
+                  </Button>
+                  <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 350, height: 130, borderRadius: 50 }} disabled={currentAccount === ""}>
+                    <Link to={'/Offermarket'} style={homeLinkStyle}>
+                      Enter Market
+                    </Link>
+                  </Button>
+                </Box>
               </Box>
             </Box>
           } />
@@ -223,7 +234,7 @@ function App() {
               {SkybreachAppBar()}
               <div class="mt-5 container">
                 <HandleOffers wallet={currentAccount} />
-                <DepositedLandCard />
+
               </div>
               {SkybreachFooter()}
             </div>

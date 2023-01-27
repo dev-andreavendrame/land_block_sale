@@ -33,11 +33,11 @@ function CreateOffer(props) {
     const inputPriceRef = useRef(null);
     const [currentOfferCoordinates, setCurrentOfferCoordinates] = useState([]);
 
-    const [landXValue, setLandXValue] = useState(0);
-    const [landYValue, setLandYValue] = useState(0);
+    const [landXValue, setLandXValue] = useState(null);
+    const [landYValue, setLandYValue] = useState(null);
 
     // Interface animation state
-    const [expanded, setExpanded] = useState(false);
+    const [expanded, setExpanded] = useState(true);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
@@ -62,6 +62,8 @@ function CreateOffer(props) {
             updatedCoords.push({ x: landXValue, y: landYValue });
             setCurrentOfferCoordinates(updatedCoords);
             console.log(currentOfferCoordinates);
+            setExpanded(false);
+            setExpanded(true);
         } else {
             console.log("Coordinates already inserted in the land list!");
             // SHOW WARNING POPUP
@@ -182,141 +184,151 @@ function CreateOffer(props) {
 
     return (
         <Box>
-            <Card className='blueGradient' sx={{ mb: 3, borderRadius: 3, boxShadow: 24, backgroundColor: '#5BC0F8' }}>
-                <CardContent>
-                    <Box display='inline-flex' alignItems='center'>
-                        <Typography variant='body2' color="text.secondary" >
-                            Lands list:
-                        </Typography>
-                        <ExpandMore
-                            expand={expanded}
-                            onClick={handleExpandClick}
-                            aria-expanded={expanded}
-                            aria-label="show more"
-                        >
-                            <ExpandMoreIcon />
-                        </ExpandMore>
-                    </Box>
-                    <Collapse in={expanded} timeout="auto" >
-                        {
-                            currentOfferCoordinates.map((coordinates) => {
-                                return (
-                                    <Typography variant='h6' color='#555555' >
-                                        {"X: " + coordinates['x'] + ", Y: " + coordinates['y']}
+            <Typography className='blueGradientText' sx={{ mr: 5, fontSize: 60, fontWeight: 1000 }}>
+                Create new offer
+            </Typography>
+
+            <Grid container spacing={5}>
+                <Grid item xs={6}>
+                    <Card className='blueGradient' sx={{ p: 1.5, mb: 3, borderRadius: 3, boxShadow: 24 }}>
+                        <CardContent>
+                            <Grid container direction='row' spacing={2} alignItems='center' >
+                                <Grid item xs={4}>
+                                    <Typography variant='h6' >
+                                        Land to sell:
                                     </Typography>
-                                );
-                            })
-                        }
-                    </Collapse>
-                    <Typography sx={{ mb: 4, ml: 1, fontWeight: 600, fontSize: 26, color: "#282c34", mt: 2 }} variant='h3'>
-                        CREATE NEW OFFER
-                    </Typography>
-                    <Grid container direction='row' spacing={2} alignItems='center' sx={{ ml: 1 }}>
-                        <Grid item xs={2}>
-                            <Typography variant='h6' >
-                                Land to sell:
-                            </Typography>
-                        </Grid>
+                                </Grid>
 
-                        <Grid item xs={3} container spacing={1} alignItems='center'>
-                            <Grid item xs={4}>
-                                <TextField
-                                    inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
-                                    size='small'
-                                    type='number'
-                                    required
-                                    id="x_coordinate"
-                                    name="x_coordinate"
-                                    onChange={handleXChange}
-                                    value={landXValue}
-                                    placeholder="X"
-                                />
+                                <Grid item xs={8} container spacing={1} alignItems='center'>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
+                                            size='small'
+                                            type='number'
+                                            required
+                                            id="x_coordinate"
+                                            name="x_coordinate"
+                                            onChange={handleXChange}
+                                            value={landXValue}
+                                            placeholder="X"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
+                                            size='small'
+                                            type='number'
+                                            required
+                                            id="y_coordinate"
+                                            name="y_coordinate"
+                                            onChange={handleYChange}
+                                            value={landYValue}
+                                            placeholder="Y"
+                                        />
+                                    </Grid>
+                                    <Grid item xs='auto'>
+                                        <Button onClick={addLandToList} className='yellowButton' variant='contained' sx={{ fontWeight: 'bold', color: '#282c34' }}>
+                                            Add
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs='auto' >
+                                        <Button onClick={removeLandFromList} className='redButton' variant='contained' sx={{ fontWeight: 'bold', color: 'white' }}>
+                                            Remove
+                                        </Button>
+                                    </Grid>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
-                                    size='small'
-                                    type='number'
-                                    required
-                                    id="y_coordinate"
-                                    name="y_coordinate"
-                                    onChange={handleYChange}
-                                    value={landYValue}
-                                    placeholder="Y"
-                                />
+
+
+                            <Grid container direction='row' spacing={2} alignItems='center' sx={{ mt: 0 }}>
+                                <Grid item xs={4}>
+                                    <Typography variant='h6' >
+                                        Price in RMRK:
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs='auto'>
+                                    <TextField
+                                        inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
+                                        size='small'
+                                        type='number'
+                                        required
+                                        id="rmrk_price"
+                                        name="rmrk_price"
+                                        onChange={inputPriceRef}
+                                        placeholder="RMRK amount"
+                                    />
+                                </Grid>
                             </Grid>
-                            <Grid item xs={4}>
-                                <Button onClick={addLandToList} className='yellowButton' variant='contained' sx={{ fontWeight: 'bold', color: '#282c34' }}>
-                                    Add
-                                </Button>
+                            <Grid container direction='row' spacing={2} alignItems='center' sx={{ mt: 0 }}>
+                                <Grid item xs={4} />
+                                <Grid item xs='auto'>
+                                    <Typography variant='h6' color='#555555' >
+                                        Actual service fee:
+                                    </Typography>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={4}>
-                                <Button onClick={removeLandFromList} className='redButton' variant='contained' sx={{ fontWeight: 'bold', color: '#282c34' }}>
-                                    Remove
-                                </Button>
+                        </CardContent>
+
+                        <CardActions>
+                            <Grid container spacing={2} direction='column' alignItems='center' >
+                                <Grid item container direction='row' spacing={0} alignItems='center'>
+                                    <Grid item xs={4} align='center'>
+                                        <Button onClick={declareBatchDeposit} className='yellowButton' disabled={declareDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 4 }}>
+                                            Declare deposit
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs={4} align='center'>
+                                        <Button className='yellowButton' disabled={!sendLandsButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 4 }}>
+                                            Send lands
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs={4} align='center'>
+                                        <Button className='yellowButton' disabled={!confirmDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 4 }}>
+                                            Confirm deposit
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                                <Grid item>
+                                    <Button className='redWhiteButton' disabled={!createOfferButtonState} variant='outlined' size='medium' sx={{ fontWeight: 600, backgroundColor: '#cf2020', width: 500, height: 70, borderRadius: 4, border: '4px solid', }}>
+                                        Create offer
+                                    </Button>
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Grid>
-
-
-
-                    <Grid container direction='row' spacing={2} alignItems='center' sx={{ ml: 1, mt: 0 }}>
-                        <Grid item xs={2}>
-                            <Typography variant='h6' >
-                                Price in RMRK:
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField
-                                inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
-                                size='small'
-                                type='number'
-                                required
-                                id="rmrk_price"
-                                name="rmrk_price"
-                                onChange={inputPriceRef}
-                                placeholder="RMRK amount"
-                            />
-                        </Grid>
-
-                        <Grid item xs={7}>
-                            <Box sx={{ ml: 4 }}>
-                                <Typography variant='h6' color='#555555' >
-                                    Actual service fee:
+                        </CardActions>
+                    </Card>
+                </Grid >
+                <Grid item xs={6}>
+                    <Card className='blueGradient' sx={{ p: 1.5, mb: 3, borderRadius: 3, boxShadow: 24, minHeight: 370 }}>
+                        <CardContent>
+                            <Box display='inline-flex' alignItems='center'>
+                                <Typography variant='h6' >
+                                    Lands list:
                                 </Typography>
+                                <ExpandMore
+                                    expand={expanded}
+                                    onClick={handleExpandClick}
+                                    aria-expanded={expanded}
+                                    aria-label="show more"
+                                >
+                                    <ExpandMoreIcon />
+                                </ExpandMore>
                             </Box>
-                        </Grid>
-                    </Grid>
-                </CardContent>
-
-                <CardActions>
-                    <Grid container direction='row' spacing={2} alignItems='center' sx={{ ml: 2, mt: 0, mb: 2 }}>
-                        <Grid item xs={1.4}>
-                            <Button onClick={declareBatchDeposit} className='yellowButton' disabled={declareDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 2 }}>
-                                Declare deposit
-                            </Button>
-                        </Grid>
-                        <Grid item xs={1.4}>
-                            <Button className='yellowButton' disabled={!sendLandsButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 2 }}>
-                                Send lands
-                            </Button>
-                        </Grid>
-                        <Grid item xs={1.4}>
-                            <Button className='yellowButton' disabled={!confirmDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 2 }}>
-                                Confirm deposit
-                            </Button>
-                        </Grid>
-                        <Grid item xs={1.2}>
-                        </Grid>
-                        <Grid item xs={1.5}>
-                            <Button className='redWhiteButton' disabled={!createOfferButtonState} variant='outlined' size='medium' sx={{ fontWeight: 600, backgroundColor: '#cf2020', width: 100, height: 70, borderRadius: 3, border: '4px solid', }}>
-                                Create offer
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </CardActions>
-            </Card>
-        </Box >
+                            <Collapse in={expanded} timeout="auto" >
+                                {
+                                    currentOfferCoordinates.map((coordinates) => {
+                                        return (
+                                            <Typography variant='h6' color='#555555' >
+                                                {"X: " + coordinates['x'] + ", Y: " + coordinates['y']}
+                                            </Typography>
+                                        );
+                                    })
+                                }
+                            </Collapse>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+        </Box>
 
     );
 

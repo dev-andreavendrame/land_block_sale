@@ -175,6 +175,10 @@
 .blueGradientButton:hover {
   transform: scale(1.1);
 }
+.blueGradientButton--navigation:hover {
+  filter: drop-shadow(0px 0px 20px black);
+  filter: brightness(85%);
+}
 
 .discardButton {
   border: 2px solid red !important;
@@ -186,6 +190,14 @@
 .discardButton:active {
   background-color: rgb(155, 0, 0) !important;
   border-color:rgb(155, 0, 0) !important;
+}
+
+
+.fullPage {
+  height: 100vh;
+}
+.partialPage {
+  height: 80vh;
 }
 
 /*

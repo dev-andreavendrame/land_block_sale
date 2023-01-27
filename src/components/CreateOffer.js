@@ -37,10 +37,10 @@ function CreateOffer(props) {
     const [landYValue, setLandYValue] = useState(null);
 
     // Interface animation state
-    const [expanded, setExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(true);
 
     const handleExpandClick = () => {
-        setExpanded(!expanded);
+        setIsExpanded(!isExpanded);
     };
 
 
@@ -56,17 +56,20 @@ function CreateOffer(props) {
 
         console.log("X: %d, Y: %d", landXValue, landYValue);
 
-        if (!checkCoordinatesAlreadyIn(landXValue, landYValue, currentOfferCoordinates)) {
-            // Coordinates not already inserted
-            const updatedCoords = currentOfferCoordinates;
-            updatedCoords.push({ x: landXValue, y: landYValue });
-            setCurrentOfferCoordinates(updatedCoords);
-            console.log(currentOfferCoordinates);
-            setExpanded(false);
-            setExpanded(true);
-        } else {
-            console.log("Coordinates already inserted in the land list!");
+        if (landXValue === null || landYValue === null || Number.isNaN(landXValue) || Number.isNaN(landYValue)) {
+            console.log("One or more coordinates not valid!");
             // SHOW WARNING POPUP
+        } else {
+            if (!checkCoordinatesAlreadyIn(landXValue, landYValue, currentOfferCoordinates)) {
+                // Coordinates not already inserted
+                const updatedCoords = currentOfferCoordinates;
+                updatedCoords.push({ x: landXValue, y: landYValue });
+                setCurrentOfferCoordinates(updatedCoords);
+                console.log(currentOfferCoordinates);
+            } else {
+                console.log("Coordinates already inserted in the land list!");
+                // SHOW WARNING POPUP
+            }
         }
     }
 
@@ -175,9 +178,7 @@ function CreateOffer(props) {
             .catch(error => {
                 console.log("Error: " + error);
             })
-
         return <p>Errore</p>
-
     }
 
 
@@ -305,15 +306,15 @@ function CreateOffer(props) {
                                     Lands list:
                                 </Typography>
                                 <ExpandMore
-                                    expand={expanded}
+                                    expand={isExpanded}
                                     onClick={handleExpandClick}
-                                    aria-expanded={expanded}
+                                    aria-expanded={isExpanded}
                                     aria-label="show more"
                                 >
                                     <ExpandMoreIcon />
                                 </ExpandMore>
                             </Box>
-                            <Collapse in={expanded} timeout="auto" >
+                            <Collapse in={isExpanded} timeout="auto" >
                                 {
                                     currentOfferCoordinates.map((coordinates) => {
                                         return (

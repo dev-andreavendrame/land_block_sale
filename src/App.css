@@ -151,6 +151,10 @@
   color: #696969 !important;
 }
 
+.redButton  {
+  background-color: red !important;
+}
+
 
 .blueGradient {
   background: linear-gradient(0deg, #5BC0F8, #86E5FF);
@@ -179,6 +183,9 @@
   filter: drop-shadow(0px 0px 20px black);
   filter: brightness(85%);
 }
+.blueGradientButton:disabled {
+  filter: grayscale();
+}
 
 .discardButton {
   border: 2px solid red !important;
@@ -194,10 +201,10 @@
 
 
 .fullPage {
-  height: 100vh;
+  height: 100%;
 }
 .partialPage {
-  height: 80vh;
+  height: 80%;
 }
 
 /*

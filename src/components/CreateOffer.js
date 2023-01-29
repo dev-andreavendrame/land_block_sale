@@ -1,10 +1,11 @@
 import { ethers } from "ethers";
 import { writeLandBlockSC, landBlockCA, readLandBlockSC, smartContractSkybreach } from './LandBlockSale';
+import GenericPopup from './minorComponents/GenericPopup/GenericPopup';
 
 import { React, useEffect, useState, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Card, Collapse, CardContent, Typography, Box, Grid, TextField, Button, CardActions, IconButton } from '@mui/material';
+import { Card, Collapse, CardContent, Typography, Box, Grid, TextField, Button, CardActions, IconButton, Modal } from '@mui/material';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -39,6 +40,13 @@ function CreateOffer(props) {
     // Interface animation state
     const [isExpanded, setIsExpanded] = useState(true);
 
+    // Popup
+    const [showPopup, setShowPopup] = useState(false);
+
+    const handleClosePopup = () => {
+      setShowPopup(false);
+    };
+
     const handleExpandClick = () => {
         setIsExpanded(!isExpanded);
     };
@@ -59,6 +67,7 @@ function CreateOffer(props) {
         if (landXValue === null || landYValue === null || Number.isNaN(landXValue) || Number.isNaN(landYValue)) {
             console.log("One or more coordinates not valid!");
             // SHOW WARNING POPUP
+            setShowPopup(true);
         } else {
             if (!checkCoordinatesAlreadyIn(landXValue, landYValue, currentOfferCoordinates)) {
                 // Coordinates not already inserted
@@ -188,6 +197,9 @@ function CreateOffer(props) {
             <Typography className='blueGradientText' sx={{ mr: 5, fontSize: 60, fontWeight: 1000 }}>
                 Create new offer
             </Typography>
+
+            {showPopup && <GenericPopup popupType="success" closePopup={handleClosePopup} />}
+
 
             <Grid container spacing={5}>
                 <Grid item xs={6}>

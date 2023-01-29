@@ -3,6 +3,8 @@ import { Box, Grid, Typography, Button } from '@mui/material';
 
 function GenericPopup(props) {
 
+    const { closePopup } = props;
+
     const popupGenericStyle = {
         position: 'absolute',
         top: '50%',
@@ -33,7 +35,7 @@ function GenericPopup(props) {
                         </Typography>
                     </Grid>
                     <Grid item xs={4}>
-                        <Button className={'genericPopupButton genericPopupButton--' + { popupType }} variant='contained' size='medium' sx={{ borderRadius: 50 }}>
+                        <Button onClick={closePopup} className={'genericPopupButton genericPopupButton--' + { popupType }} variant='contained' size='medium' sx={{ borderRadius: 50 }}>
                             Prova Prova
                         </Button>
                     </Grid>
@@ -46,6 +48,9 @@ function GenericPopup(props) {
     // Decoration for various popup types
     function PopupDecoration(props) {
 
+        const { closePopup } = props;
+
+
         switch (props.popupType) {
             case 'success':
                 return (
@@ -53,7 +58,8 @@ function GenericPopup(props) {
                         <PopupBase
                             popupType={props.popupType}
                             popupMessage={props.popupMessage}
-                            popupButtonMessage={props.popupButtonMessage} />
+                            popupButtonMessage={props.popupButtonMessage}
+                            closePopup={closePopup} />
                     </Box>
                 );
             case 'warning':
@@ -62,7 +68,8 @@ function GenericPopup(props) {
                         <PopupBase
                             popupType={props.popupType}
                             popupMessage={props.popupMessage}
-                            popupButtonMessage={props.popupButtonMessage} />
+                            popupButtonMessage={props.popupButtonMessage}
+                            closePopup={closePopup} />
                     </Box>
                 );
             case 'danger':
@@ -71,7 +78,8 @@ function GenericPopup(props) {
                         <PopupBase
                             popupType={props.popupType}
                             popupMessage={props.popupMessage}
-                            popupButtonMessage={props.popupButtonMessage} />
+                            popupButtonMessage={props.popupButtonMessage}
+                            closePopup={closePopup} />
                     </Box>
                 );
             default:
@@ -80,7 +88,8 @@ function GenericPopup(props) {
                         <PopupBase
                             popupType={props.popupType}
                             popupMessage={props.popupMessage}
-                            popupButtonMessage={props.popupButtonMessage} />
+                            popupButtonMessage={props.popupButtonMessage}
+                            closePopup={closePopup} />
                     </Box>
                 );
         }
@@ -90,7 +99,8 @@ function GenericPopup(props) {
         <PopupDecoration
             popupType={props.popupType}
             popupMessage={props.popupMessage}
-            popupButtonMessage={props.popupButtonMessage} />
+            popupButtonMessage={props.popupButtonMessage}
+            closePopup={closePopup} />
     );
 
 } export default GenericPopup;

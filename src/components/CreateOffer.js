@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { writeLandBlockSC, landBlockCA, readLandBlockSC, smartContractSkybreach } from './LandBlockSale';
 import GenericPopup from './minorComponents/GenericPopup/GenericPopup';
+import GenericLog from './minorComponents/GenericLog/GenericLog';
 
 import { React, useEffect, useState, useRef } from 'react';
 import { styled } from '@mui/material/styles';
@@ -40,13 +41,18 @@ function CreateOffer(props) {
     // Interface animation state
     const [isExpanded, setIsExpanded] = useState(true);
 
-    // Popup
+
+    // Popup & log
     const [showPopup, setShowPopup] = useState(false);
+    const [logLandNotFound, setLogLandNotFound] = useState("");
+    const [logInvalidCoordinates, setLogInvalidCoordinates] = useState("");
 
     const handleClosePopup = () => {
-      setShowPopup(false);
-    };
+        setShowPopup(false);
+    };    
 
+
+    // collapsable elements
     const handleExpandClick = () => {
         setIsExpanded(!isExpanded);
     };
@@ -67,7 +73,7 @@ function CreateOffer(props) {
         if (landXValue === null || landYValue === null || Number.isNaN(landXValue) || Number.isNaN(landYValue)) {
             console.log("One or more coordinates not valid!");
             // SHOW WARNING POPUP
-            setShowPopup(true);
+            setLogInvalidCoordinates("Invalid Coordinates");
         } else {
             if (!checkCoordinatesAlreadyIn(landXValue, landYValue, currentOfferCoordinates)) {
                 // Coordinates not already inserted
@@ -104,6 +110,7 @@ function CreateOffer(props) {
         if (indexToRemove === -1) {
             console.log("Land to remove not found!");
             // MOSTRARE POPUP NOT FOUND (WARNING)
+            setLogLandNotFound("Land not found");
         } else {
             console.log("Land removed!");
             // MOSTRARE POPUP LAND REMOVED (SUCCESS)
@@ -198,22 +205,45 @@ function CreateOffer(props) {
                 Create new offer
             </Typography>
 
-            {showPopup && <GenericPopup popupType="success" closePopup={handleClosePopup} />}
+            <GenericPopup
+                handleOpen={showPopup}
+                handleClose={handleClosePopup}
+                popupType="warning"
+                popupMessage="Testo di prova"
+                popupButtonMessage="Ok"
+                popupButtonAction={handleClosePopup} />
 
+            {logLandNotFound ? 
+            <GenericLog
+                logType='danger'
+                logMessage={logLandNotFound}
+                logReset={setLogLandNotFound} />
+                :
+                <></>
+            }
+            {logInvalidCoordinates ? 
+            <GenericLog
+                logType='warning'
+                logMessage={logInvalidCoordinates}
+                logReset={setLogInvalidCoordinates} />
+                :
+                <></>
+            }
 
             <Grid container spacing={5}>
                 <Grid item xs={6}>
-                    <Card className='blueGradient' sx={{ p: 1.5, mb: 3, borderRadius: 3, boxShadow: 24 }}>
+
+                    <Card className='blueGradient' sx={{ p: 1.5, mb: 3, borderRadius: 3, boxShadow: 8 }}>
                         <CardContent>
-                            <Grid container direction='row' spacing={2} alignItems='center' >
+                            <Grid container direction='column' spacing={0.5} justifyContent='center' sx={{ mb: 3 }} >
                                 <Grid item xs={4}>
                                     <Typography variant='h6' >
                                         Land to sell:
                                     </Typography>
                                 </Grid>
 
-                                <Grid item xs={8} container spacing={1} alignItems='center'>
-                                    <Grid item xs={3}>
+                                <Grid item xs='auto' container spacing={1} alignItems='center'>
+                                    <Grid item xs='auto'>
                                         <TextField
                                             inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
                                             size='small'
@@ -224,9 +254,10 @@ function CreateOffer(props) {
                                             onChange={handleXChange}
                                             value={landXValue}
                                             placeholder="X"
+                                            sx={{ maxWidth: 100 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={3}>
+                                    <Grid item xs='auto'>
                                         <TextField
                                             inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
                                             size='small'
@@ -237,15 +268,16 @@ function CreateOffer(props) {
                                             onChange={handleYChange}
                                             value={landYValue}
                                             placeholder="Y"
+                                            sx={{ maxWidth: 100 }}
                                         />
                                     </Grid>
                                     <Grid item xs='auto'>
-                                        <Button onClick={addLandToList} className='yellowButton' variant='contained' sx={{ fontWeight: 'bold', color: '#282c34' }}>
+                                        <Button onClick={addLandToList} className='yellowButton' variant='contained' sx={{ maxWidth: 100, fontWeight: 'bold', color: '#282c34' }}>
                                             Add
                                         </Button>
                                     </Grid>
                                     <Grid item xs='auto' >
-                                        <Button onClick={removeLandFromList} className='redButton' variant='contained' sx={{ fontWeight: 'bold', color: 'white' }}>
+                                        <Button onClick={removeLandFromList} className='redButton' variant='contained' sx={{ maxWidth: 100, fontWeight: 'bold', color: 'white' }}>
                                             Remove
                                         </Button>
                                     </Grid>
@@ -253,33 +285,33 @@ function CreateOffer(props) {
                             </Grid>
 
 
-                            <Grid container direction='row' spacing={2} alignItems='center' sx={{ mt: 0 }}>
+                            <Grid container direction='column' spacing={0.5} justifyContent='center' sx={{ mb: 2 }}>
                                 <Grid item xs={4}>
                                     <Typography variant='h6' >
                                         Price in RMRK:
                                     </Typography>
                                 </Grid>
-                                <Grid item xs='auto'>
-                                    <TextField
-                                        inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
-                                        size='small'
-                                        type='number'
-                                        required
-                                        id="rmrk_price"
-                                        name="rmrk_price"
-                                        onChange={inputPriceRef}
-                                        placeholder="RMRK amount"
-                                    />
+                                <Grid item xs='auto' container spacing={2} direction='row' alignItems='end' >
+                                    <Grid item xs='auto'>
+                                        <TextField
+                                            inputProps={{ style: { backgroundColor: 'white', borderRadius: 5 } }}
+                                            size='small'
+                                            type='number'
+                                            required
+                                            id="rmrk_price"
+                                            name="rmrk_price"
+                                            onChange={inputPriceRef}
+                                            placeholder="RMRK amount"
+                                        />
+                                    </Grid>
+                                    <Grid item xs='auto'>
+                                        <Typography variant='h6' color='#666666' sx={{ fontSize: 16 }} >
+                                            Actual service fee:
+                                        </Typography>
+                                    </Grid>
                                 </Grid>
                             </Grid>
-                            <Grid container direction='row' spacing={2} alignItems='center' sx={{ mt: 0 }}>
-                                <Grid item xs={4} />
-                                <Grid item xs='auto'>
-                                    <Typography variant='h6' color='#555555' >
-                                        Actual service fee:
-                                    </Typography>
-                                </Grid>
-                            </Grid>
+
                         </CardContent>
 
                         <CardActions>
@@ -311,7 +343,7 @@ function CreateOffer(props) {
                     </Card>
                 </Grid >
                 <Grid item xs={6}>
-                    <Card className='blueGradient' sx={{ p: 1.5, mb: 3, borderRadius: 3, boxShadow: 24, minHeight: 370 }}>
+                    <Card className='blueGradient' sx={{ p: 1.5, mb: 3, borderRadius: 3, boxShadow: 8, minHeight: 370 }}>
                         <CardContent>
                             <Box display='inline-flex' alignItems='center'>
                                 <Typography variant='h6' >

@@ -1,9 +1,7 @@
 import './GenericPopup.css';
-import { Box, Grid, Typography, Button } from '@mui/material';
+import { Box, Grid, Typography, Button, Modal } from '@mui/material';
 
 function GenericPopup(props) {
-
-    const { closePopup } = props;
 
     const popupGenericStyle = {
         position: 'absolute',
@@ -12,7 +10,6 @@ function GenericPopup(props) {
         transform: 'translate(-50%, -50%)',
         width: 400,
         height: 300,
-       
         borderRadius: 5
     };
 
@@ -20,9 +17,10 @@ function GenericPopup(props) {
     function PopupBase(props) {
 
         const popupType = props.popupType;
+        const popupButtonAction = props.popupButtonAction;
 
         return (
-            <Box display='flex' justifyContent='center' alignItems='center' sx={{width: 390, height: 290, borderRadius: 4, backgroundColor: 'white' }}>
+            <Box display='flex' justifyContent='center' alignItems='center' sx={{ width: 390, height: 290, borderRadius: 4, backgroundColor: 'white' }}>
                 <Box display='flex' justifyContent='flex-start'>
                     <Typography className={{ popupType } + 'Text'} variant='overline' sx={{ fontSize: 15, fontWeight: 600 }}>
                         {popupType}
@@ -35,7 +33,7 @@ function GenericPopup(props) {
                         </Typography>
                     </Grid>
                     <Grid item xs={4}>
-                        <Button onClick={closePopup} className={'genericPopupButton genericPopupButton--' + { popupType }} variant='contained' size='medium' sx={{ borderRadius: 50 }}>
+                        <Button onClick={popupButtonAction} className={'genericPopupButton genericPopupButton--' + { popupType }} variant='contained' size='medium' sx={{ borderRadius: 50 }}>
                             Prova Prova
                         </Button>
                     </Grid>
@@ -48,9 +46,6 @@ function GenericPopup(props) {
     // Decoration for various popup types
     function PopupDecoration(props) {
 
-        const { closePopup } = props;
-
-
         switch (props.popupType) {
             case 'success':
                 return (
@@ -59,7 +54,7 @@ function GenericPopup(props) {
                             popupType={props.popupType}
                             popupMessage={props.popupMessage}
                             popupButtonMessage={props.popupButtonMessage}
-                            closePopup={closePopup} />
+                            popupButtonAction={props.popupButtonAction} />
                     </Box>
                 );
             case 'warning':
@@ -69,7 +64,7 @@ function GenericPopup(props) {
                             popupType={props.popupType}
                             popupMessage={props.popupMessage}
                             popupButtonMessage={props.popupButtonMessage}
-                            closePopup={closePopup} />
+                            popupButtonAction={props.popupButtonAction} />
                     </Box>
                 );
             case 'danger':
@@ -79,7 +74,7 @@ function GenericPopup(props) {
                             popupType={props.popupType}
                             popupMessage={props.popupMessage}
                             popupButtonMessage={props.popupButtonMessage}
-                            closePopup={closePopup} />
+                            popupButtonAction={props.popupButtonAction} />
                     </Box>
                 );
             default:
@@ -89,18 +84,26 @@ function GenericPopup(props) {
                             popupType={props.popupType}
                             popupMessage={props.popupMessage}
                             popupButtonMessage={props.popupButtonMessage}
-                            closePopup={closePopup} />
+                            popupButtonAction={props.popupButtonAction} />
                     </Box>
                 );
         }
     }
 
     return (
-        <PopupDecoration
-            popupType={props.popupType}
-            popupMessage={props.popupMessage}
-            popupButtonMessage={props.popupButtonMessage}
-            closePopup={closePopup} />
+        <Modal
+            open={props.handleOpen}
+            onClose={props.handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            style={{ backdropFilter: "blur(3px)" }}
+        >
+            <PopupDecoration
+                popupType={props.popupType}
+                popupMessage={props.popupMessage}
+                popupButtonMessage={props.popupButtonMessage}
+                popupButtonAction={props.popupButtonAction} />
+        </Modal>
     );
 
 } export default GenericPopup;

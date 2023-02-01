@@ -34,6 +34,7 @@ function OfferCard(props) {
     // Parent passed values
     const currentOfferId = props.id;
     const isThisOfferMine = props.isMyOffer;
+    const userWallet = props.userWallet;
 
     // Component state variables
     const [offerDetails, setOfferDetails] = useState(null);
@@ -166,7 +167,7 @@ function OfferCard(props) {
                             {getPresenceIcon(hasAdjacencyBonus)}
                         </Box>
                     </Box>
-                    {isThisOfferMine ?
+                    {userWallet === offerMaker ?
                         <Box display='flex' justifyContent='flex-end'>
                             <Button className='discardButton' variant='outlined' sx={{ mt: 2, fontWeight: 'bold', color: 'red', width: 100, borderRadius: 2 }}>
                                 Cancel

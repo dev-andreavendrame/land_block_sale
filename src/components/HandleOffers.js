@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from 'react';
+import { React, useState } from 'react';
 import { landBlockSalesReadable } from './smartContracts/MoonriverConfig.js';
 import OfferCard from './OfferCard';
 import { Typography, Box, Button, IconButton, Grid } from '@mui/material';
@@ -60,7 +60,7 @@ function HandleOffers(props) {
                             <OfferCard
                                 id={offerId}
                                 key={offerId}
-                                isMyOffer={true} />
+                                userWallet={userWallet} />
                         </Grid>
                     ))}
                 </Grid>

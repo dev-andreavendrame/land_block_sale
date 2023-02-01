@@ -33,7 +33,6 @@ function OfferCard(props) {
 
     // Parent passed values
     const currentOfferId = props.id;
-    const isThisOfferMine = props.isMyOffer;
     const userWallet = props.userWallet;
 
     // Component state variables

@@ -73,7 +73,8 @@ function OfferCard(props) {
                         setServiceFee(offerDetails['serviceFee']);
                         setOfferTimestamp(offerDetails['timestamp']);
                         setOfferMaker(offerDetails['offerMaker']);
-                        setHasAdjacencyBonus(calculateAdjacencyBonus(landIdsInOffer));
+                        hadAdjacencyBonus()
+                        setHasAdjacencyBonus(hasIt(landIdsInOffer));
 
                         // Get info about Othala Chunkies and Gift Boxes presence
                         setChunkyBlockPresence(getPresences(landIdsInOffer, CHUNKY_LAND_IDS));
@@ -160,7 +161,7 @@ function OfferCard(props) {
                         </Box>
                         <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
                             <Typography sx={{ mr: 5 }}>
-                                <Box fontWeight='fontWeightMedium' display='inline'> Adjacency bonus:</Box> {hasAdjacencyBonus ? "Yes" : "No"}
+                                <Box fontWeight='fontWeightMedium' display='inline'> Adjacency bonus:</Box> {hasIt(landIdsInOffer) ? "Yes" : "No"}
                             </Typography>
                             {getPresenceIcon(hasAdjacencyBonus)}
                         </Box>
@@ -197,39 +198,34 @@ function getRMRKBlockPrice(landBlockPrice) {
     return price + " RMRK";
 }
 
-function calculateAdjacencyBonus(landIds) {
 
-    if (landIds.length < 9) {
-        return true;
-    }
-
-    var hasBonus = false;
-
-    for (let i = 0; i < landIds.length; i++) {
-        var currentHasBonus = true;
-        const currentLandId = landIds[i];
-        const y = Math.floor(currentLandId / 256);
-        const x = currentLandId % 256;
-
-        currentHasBonus = currentHasBonus & landIds.includes((y + 1) * 256 + (x - 1))   // top left corner
-        currentHasBonus = currentHasBonus & landIds.includes((y + 1) * 256 + (x))     // top middle
-        currentHasBonus = currentHasBonus & landIds.includes((y + 1) * 256 + (x + 1))   // top right corner
-
-        currentHasBonus = currentHasBonus & landIds.includes((y) * 256 + (x - 1))     // left side 
-        currentHasBonus = currentHasBonus & landIds.includes((y) * 256 + (x + 1))     // right side
-
-        currentHasBonus = currentHasBonus & landIds.includes((y - 1) * 256 + (x - 1))   // bottom left corner
-        currentHasBonus = currentHasBonus & landIds.includes((y - 1) * 256 + (x))     // bottom middle
-        currentHasBonus = currentHasBonus & landIds.includes((y - 1) * 256 + (x + 1))   // bottom right corner
-
-        // We need only one land to have the bonus to end the function
-        if (currentHasBonus) {
-            return false;
+function hasIt(landsOwned) {
+    for (let i = 0; i < landsOwned.length; i++) {
+        const x = landsOwned[i] % 256;
+        const y = landsOwned[i] / 256;
+        console.log("X: %d, Y: %d", x, y);
+        if (hadAdjacencyBonus(x, y, landsOwned)) {
+            return true;
         }
     }
+    return false;
+}
 
-    return hasBonus;
-
+function hadAdjacencyBonus(a, b, landsOwned) {
+    const x = parseInt(a);
+    const y = parseInt(b);
+    console.log("x: %d, y: %d", x, y);
+    console.log("Land corrente: " + (x+y*256));
+    console.log("Land in offerta: " + landsOwned);
+    for (let i = x - 1; i <= x + 1; i++) {
+        for (let j = y - 1; j <= y + 1; j++) {
+            const currentLand = i + j * 256;
+            if (!landsOwned.includes(currentLand)) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 function getPresences(ids, data) {

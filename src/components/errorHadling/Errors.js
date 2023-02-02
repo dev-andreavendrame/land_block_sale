@@ -4,6 +4,7 @@ export const LAND_NOT_FOUND = 1;
 export const INVALID_COORDINATES = 2;
 export const COORDINATES_ALREADY_INSERTED = 3;
 export const NEGATIVE_COORDINATE = 4;
+export const LAND_NOT_OWNED = 5;
 
 
 export function getPopupContent(errorCode, stateVariable, setStateFunction) {
@@ -32,7 +33,13 @@ export function getPopupContent(errorCode, stateVariable, setStateFunction) {
                     logType='warning'
                     logMessage={stateVariable}
                     logReset={setStateFunction} />);
-                default:
+        case LAND_NOT_OWNED:
+            return (
+                <GenericLog
+                    logType='error'
+                    logMessage={stateVariable}
+                    logReset={setStateFunction} />);
+        default:
             return (<></>);
     }
 

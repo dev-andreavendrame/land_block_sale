@@ -2,12 +2,14 @@ import { ethers } from "ethers";
 import { writeLandBlockSC, landBlockCA, readLandBlockSC, smartContractSkybreach } from './LandBlockSale';
 import GenericPopup from './minorComponents/GenericPopup/GenericPopup';
 import { getPopupContent } from './errorHadling/Errors';
+import { getLandIdsFromCoordinates, getEffectiveBlockPrice } from "../logicUtils/SkybreachUtils";
 
 import { React, useEffect, useState, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Card, Collapse, CardContent, Typography, Box, Grid, TextField, Button, CardActions, IconButton, Modal } from '@mui/material';
-import { COORDINATES_ALREADY_INSERTED, INVALID_COORDINATES, LAND_NOT_FOUND, NEGATIVE_COORDINATE } from "./errorHadling/Errors";
+import { Card, Collapse, CardContent, Typography, Box, Grid, TextField, Button, IconButton } from '@mui/material';
+import { COORDINATES_ALREADY_INSERTED, INVALID_COORDINATES, LAND_NOT_FOUND, NEGATIVE_COORDINATE, LAND_NOT_OWNED } from "./errorHadling/Errors";
+import { LAND_NOT_OWNED_ERROR, DEPOSIT_NOT_DECLARED, DEPOSIT_NOT_DONE_YET } from "./errorHadling/MetamaskErrors";
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -26,7 +28,7 @@ function CreateOffer(props) {
     const [blockPrice, setBlockPrice] = useState(-1);
     const [serviceFee, setServiceFee] = useState(null);
 
-    const [declareDepositButtonState, setDeclareDepositButtonState] = useState(false);
+    const [declareDepositButtonState, setDeclareDepositButtonState] = useState(true);
     const [sendLandsButtonState, setSendLandsButtonState] = useState(false);
     const [confirmDepositButtonState, setConfirmDepositButtonState] = useState(false);
     const [createOfferButtonState, setCreateOfferButtonState] = useState(false);
@@ -67,6 +69,11 @@ function CreateOffer(props) {
     const [logInvalidCoordinates, setLogInvalidCoordinates] = useState("");
     const [logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted] = useState("");
     const [logNegativeCoordinate, setLogNegativeCoordinate] = useState("");
+
+    // Logs for Smart contract errors
+    const [errorLandNotOwned, setErrorLandNotOwned] = useState("");
+    const [errorDepositNotDeclared, setErrorDepositNotDeclared] = useState("");
+    const [errorNotDepositedYet, setErrorNotDepositedYet] = useState("");
 
     // collapsable elements
     const handleExpandClick = () => {
@@ -156,7 +163,7 @@ function CreateOffer(props) {
     // Create new offer
     function createOffer() {
 
-        var landIds = decodeOfferLands(currentOfferCoordinates);
+        var landIds = getLandIdsFromCoordinates(currentOfferCoordinates);
         var blockPrice = getEffectiveBlockPrice(inputPriceRef.current.value);
         console.log("Land ids: " + landIds + " offer price: " + blockPrice + " RMRK");
         // Execute transactions
@@ -165,33 +172,51 @@ function CreateOffer(props) {
 
     // Declare deposit
     function declareBatchDeposit() {
-        var landIds = decodeOfferLands(currentOfferCoordinates);
+        var landIds = getLandIdsFromCoordinates(currentOfferCoordinates);
         writeLandBlockSC.declareBatchLandDeposit(landIds)
             .then(depositBatchResult => {
                 console.log("Deposit batch result: " + depositBatchResult);
             })
             .catch(error => {
+                if ((error.message).indexOf(LAND_NOT_OWNED_ERROR)) {
+                    // SHOW LOG ERROR
+                    setErrorLandNotOwned("One or more land inserted not owned");
+                }
                 console.log("land: " + landIds);
                 console.log("Deposit batch error: " + error);
             });
+        // Close popup
+        setPopupDeclareDeposit(false);
 
     }
 
     // Confirm deposit
     function confirmBatchDeposit() {
-        var landIds = decodeOfferLands(currentOfferCoordinates);
+        var landIds = getLandIdsFromCoordinates(currentOfferCoordinates);
         writeLandBlockSC.confirmBatchLandDeposit(landIds)
             .then(depositResult => {
                 console.log("Deposit result" + depositResult);
             })
             .catch(error => {
+                if ((error.message).indexOf(DEPOSIT_NOT_DECLARED)) {
+                    // SHOW LOG ERROR
+                    setErrorDepositNotDeclared("Deposit for the current lands not declared yet.");
+                }
+                if ((error.message).indexOf(DEPOSIT_NOT_DONE_YET)) {
+                    // SHOW LOG ERROR
+                    setErrorNotDepositedYet("Current lands not yet deposited.");
+                }
+                // Close popups
+                setErrorDepositNotDeclared(false);
+                setErrorNotDepositedYet(false);
+
                 console.log("Errore batch deposit: " + error);
             });
     }
 
     // Send Lands
     function sendLands() {
-        var landIds = decodeOfferLands(currentOfferCoordinates);
+        var landIds = getLandIdsFromCoordinates(currentOfferCoordinates);
         var sendLandPromises = [];
         for (let i = 0; i < landIds.length; i++) {
             sendLandPromises.push(smartContractSkybreach.transfer(landIds[i], landBlockCA));
@@ -237,6 +262,10 @@ function CreateOffer(props) {
             {logCoordinateAlreadyInserted ? getPopupContent(COORDINATES_ALREADY_INSERTED, logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted) : <></>}
             {logNegativeCoordinate ? getPopupContent(NEGATIVE_COORDINATE, logNegativeCoordinate, setLogNegativeCoordinate) : <></>}
 
+            {errorLandNotOwned ? getPopupContent(LAND_NOT_OWNED, errorLandNotOwned, setErrorLandNotOwned) : <></>}
+            {errorDepositNotDeclared ? getPopupContent(DEPOSIT_NOT_DECLARED, errorDepositNotDeclared, setErrorDepositNotDeclared) : <></>}
+            {errorNotDepositedYet ? getPopupContent(DEPOSIT_NOT_DONE_YET, errorNotDepositedYet, setErrorNotDepositedYet) : <></>}
+
             {popupDeclareDeposit ?
                 <GenericPopup
                     handleOpen={popupDeclareDeposit}
@@ -244,7 +273,18 @@ function CreateOffer(props) {
                     popupType="normal"
                     popupMessage="Testo di prova"
                     popupButtonMessage="Ok"
-                    popupButtonAction={closePopupDeclareDeposit} />
+                    popupButtonAction={declareBatchDeposit} />
+                :
+                <></>
+            }
+            {popupConfirmDeposit ?
+                <GenericPopup
+                    handleOpen={popupConfirmDeposit}
+                    handleClose={closePopupConfirmDeposit}
+                    popupType="normal"
+                    popupMessage="Testo di prova"
+                    popupButtonMessage="Ok"
+                    popupButtonAction={confirmBatchDeposit} />
                 :
                 <></>
             }
@@ -366,7 +406,7 @@ function CreateOffer(props) {
 
                                 <Grid item xs='auto' container spacing={2} direction='row' alignItems='center' >
                                     <Grid item xs='auto'>
-                                        <Button className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
+                                        <Button onClick={setPopupConfirmDeposit} className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
                                             Confirm Deposit
                                         </Button>
                                     </Grid>
@@ -445,30 +485,4 @@ function checkCoordinatesAlreadyIn(currentX, currentY, currentCoordinates) {
     }
 
     return false;
-}
-
-function decodeOfferLands(currentCoordinates) {
-
-    let landIds = [];
-
-    for (let i = 0; i < currentCoordinates.length; i++) {
-        const currentX = currentCoordinates[i]['x'];
-        const currentY = currentCoordinates[i]['y'];
-
-        console.log("X: %d, Y: %d", currentX, currentY);
-
-        const landId = currentX + currentY * 256;
-        landIds.push(landId);
-    }
-
-    console.log("Lands inserted in the offer: %d", landIds.length);
-
-    return landIds;
-}
-
-function getEffectiveBlockPrice(rawPrice) {
-
-    // Example of correct price encoding 12.99
-
-    return parseFloat(rawPrice) * 10 ** 10;
 }

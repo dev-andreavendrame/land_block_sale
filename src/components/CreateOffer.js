@@ -1,12 +1,13 @@
 import { ethers } from "ethers";
 import { writeLandBlockSC, landBlockCA, readLandBlockSC, smartContractSkybreach } from './LandBlockSale';
 import GenericPopup from './minorComponents/GenericPopup/GenericPopup';
-import GenericLog from './minorComponents/GenericLog/GenericLog';
+import {getPopupContent} from './errorHadling/Errors';
 
 import { React, useEffect, useState, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Card, Collapse, CardContent, Typography, Box, Grid, TextField, Button, CardActions, IconButton, Modal } from '@mui/material';
+import { COORDINATES_ALREADY_INSERTED, INVALID_COORDINATES, LAND_NOT_FOUND, NEGATIVE_COORDINATE } from "./errorHadling/Errors";
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -44,19 +45,20 @@ function CreateOffer(props) {
 
     // Popup & log
     const [showPopup, setShowPopup] = useState(false);
+    // Logs states
     const [logLandNotFound, setLogLandNotFound] = useState("");
     const [logInvalidCoordinates, setLogInvalidCoordinates] = useState("");
+    const [logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted] = useState("");
+    const [logNegativeCoordinate, setLogNegativeCoordinate] = useState("");
 
     const handleClosePopup = () => {
         setShowPopup(false);
-    };    
-
+    };
 
     // collapsable elements
     const handleExpandClick = () => {
         setIsExpanded(!isExpanded);
     };
-
 
     useEffect(() => {
 
@@ -74,6 +76,9 @@ function CreateOffer(props) {
             console.log("One or more coordinates not valid!");
             // SHOW WARNING POPUP
             setLogInvalidCoordinates("Invalid Coordinates");
+        } else if (landXValue < 0 || landYValue < 0) {
+            // SHOW WARNING POPUP
+            setLogNegativeCoordinate("One or more coordinates are less than 0");
         } else {
             if (!checkCoordinatesAlreadyIn(landXValue, landYValue, currentOfferCoordinates)) {
                 // Coordinates not already inserted
@@ -84,6 +89,8 @@ function CreateOffer(props) {
             } else {
                 console.log("Coordinates already inserted in the land list!");
                 // SHOW WARNING POPUP
+                setLogCoordinateAlreadyInserted("Land coordinates already inserted!");
+
             }
         }
     }
@@ -213,23 +220,11 @@ function CreateOffer(props) {
                 popupButtonMessage="Ok"
                 popupButtonAction={handleClosePopup} />
 
-            {logLandNotFound ? 
-            <GenericLog
-                logType='danger'
-                logMessage={logLandNotFound}
-                logReset={setLogLandNotFound} />
-                :
-                <></>
-            }
-            {logInvalidCoordinates ? 
-            <GenericLog
-                logType='warning'
-                logMessage={logInvalidCoordinates}
-                logReset={setLogInvalidCoordinates} />
-                :
-                <></>
-            }
-
+            {logLandNotFound ? getPopupContent(LAND_NOT_FOUND, logLandNotFound, setLogLandNotFound) : <></>}
+            {logInvalidCoordinates ? getPopupContent(INVALID_COORDINATES, logInvalidCoordinates, setLogInvalidCoordinates) : <></>}
+            {logCoordinateAlreadyInserted ? getPopupContent(COORDINATES_ALREADY_INSERTED, logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted) : <></>}
+            {logNegativeCoordinate ? getPopupContent(NEGATIVE_COORDINATE, logNegativeCoordinate, setLogNegativeCoordinate) : <></>}
+            
             <Grid container spacing={5}>
                 <Grid item xs={6}>
 
@@ -306,7 +301,7 @@ function CreateOffer(props) {
                                     </Grid>
                                     <Grid item xs='auto'>
                                         <Typography variant='h6' color='#666666' sx={{ fontSize: 16 }} >
-                                            Actual service fee:
+                                            {serviceFee}
                                         </Typography>
                                     </Grid>
                                 </Grid>

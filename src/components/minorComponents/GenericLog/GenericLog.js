@@ -79,9 +79,9 @@ function LogDecoration(props) {
                         logMessage={props.logMessage} />
                 </Box>
             );
-        case 'danger':
+        case 'error':
             return (
-                <Box className='dangerPopupBackground' display='flex' justifyContent='center' alignItems='center' sx={logGenericStyle}>
+                <Box className='errorPopupBackground' display='flex' justifyContent='center' alignItems='center' sx={logGenericStyle}>
                     <LogBase
                         logType={props.logType}
                         logMessage={props.logMessage} />

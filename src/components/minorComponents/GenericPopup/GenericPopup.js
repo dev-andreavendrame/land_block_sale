@@ -8,9 +8,10 @@ function GenericPopup(props) {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: 400,
+        width: 500,
         height: 300,
-        borderRadius: 5
+        borderRadius: 5,
+        boxShadow: 12
     };
 
     // Popup base content
@@ -19,21 +20,27 @@ function GenericPopup(props) {
         const popupType = props.popupType;
         const popupButtonAction = props.popupButtonAction;
 
+        const typeText = {
+            position: 'absolute',
+            top: '2%',
+            left: '7%',
+        }
+
         return (
-            <Box display='flex' justifyContent='center' alignItems='center' sx={{ width: 390, height: 290, borderRadius: 4, backgroundColor: 'white' }}>
-                <Box display='flex' justifyContent='flex-start'>
-                    <Typography className={{ popupType } + 'Text'} variant='overline' sx={{ fontSize: 15, fontWeight: 600 }}>
+            <Box display='flex' justifyContent='center' alignItems='center' sx={{ width: 490, height: 290, borderRadius: 4, backgroundColor: 'white' }}>
+                <Box display='flex' justifyContent='flex-start' style={typeText}>
+                    <Typography className={popupType + 'Text'} variant='overline' sx={{ fontSize: 16, fontWeight: 1000 }}>
                         {popupType}
                     </Typography>
                 </Box>
-                <Grid container spacing={1} direction='column'>
-                    <Grid item xs={8}>
-                        <Typography variant='body1' sx={{ fontSize: 18, fontWeight: 600 }}>
+                <Grid container spacing={1} direction='column' alignItems='center'>
+                    <Grid item xs={9}>
+                        <Typography align='center' variant='body1' sx={{ p: 2, fontSize: 18, fontWeight: 600 }}>
                             Lorem ipsum - questo testo serve puramente come prova. Il test è utile a capire come si presenta visivamente a schermo
                         </Typography>
                     </Grid>
                     <Grid item xs={4}>
-                        <Button onClick={popupButtonAction} className={'genericPopupButton genericPopupButton--' + { popupType }} variant='contained' size='medium' sx={{ borderRadius: 50 }}>
+                        <Button onClick={popupButtonAction} className={'genericPopupButton genericPopupButton--' + popupType } variant='contained' size='medium' sx={{ mt: 2, borderRadius: 50 }}>
                             Prova Prova
                         </Button>
                     </Grid>
@@ -67,9 +74,9 @@ function GenericPopup(props) {
                             popupButtonAction={props.popupButtonAction} />
                     </Box>
                 );
-            case 'danger':
+            case 'error':
                 return (
-                    <Box className='dangerPopupBackground' display='flex' justifyContent='center' alignItems='center' sx={popupGenericStyle}>
+                    <Box className='errorPopupBackground' display='flex' justifyContent='center' alignItems='center' sx={popupGenericStyle}>
                         <PopupBase
                             popupType={props.popupType}
                             popupMessage={props.popupMessage}
@@ -81,7 +88,7 @@ function GenericPopup(props) {
                 return (
                     <Box className='normalPopupBackground' display='flex' justifyContent='center' alignItems='center' sx={popupGenericStyle}>
                         <PopupBase
-                            popupType={props.popupType}
+                            popupType={'normal'}
                             popupMessage={props.popupMessage}
                             popupButtonMessage={props.popupButtonMessage}
                             popupButtonAction={props.popupButtonAction} />

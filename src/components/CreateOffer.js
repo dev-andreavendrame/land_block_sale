@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { writeLandBlockSC, landBlockCA, readLandBlockSC, smartContractSkybreach } from './LandBlockSale';
 import GenericPopup from './minorComponents/GenericPopup/GenericPopup';
-import {getPopupContent} from './errorHadling/Errors';
+import { getPopupContent } from './errorHadling/Errors';
 
 import { React, useEffect, useState, useRef } from 'react';
 import { styled } from '@mui/material/styles';
@@ -40,20 +40,33 @@ function CreateOffer(props) {
     const [landYValue, setLandYValue] = useState(null);
 
     // Interface animation state
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(false);
 
 
     // Popup & log
-    const [showPopup, setShowPopup] = useState(false);
+    const [popupDeclareDeposit, setPopupDeclareDeposit] = useState(false);
+    const [popupSendLands, setPopupSendLands] = useState(false);
+    const [popupConfirmDeposit, setPopupConfirmDeposit] = useState(false);
+    const [popupCreateOffer, setPopupCreateOffer] = useState(false);
+
+    const closePopupDeclareDeposit = () => {
+        setPopupDeclareDeposit(false);
+    };
+    const closePopupSendLands = () => {
+        setPopupSendLands(false);
+    };
+    const closePopupConfirmDeposit = () => {
+        setPopupConfirmDeposit(false);
+    };
+    const closePopupCreateOffer = () => {
+        setPopupCreateOffer(false);
+    };
+
     // Logs states
     const [logLandNotFound, setLogLandNotFound] = useState("");
     const [logInvalidCoordinates, setLogInvalidCoordinates] = useState("");
     const [logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted] = useState("");
     const [logNegativeCoordinate, setLogNegativeCoordinate] = useState("");
-
-    const handleClosePopup = () => {
-        setShowPopup(false);
-    };
 
     // collapsable elements
     const handleExpandClick = () => {
@@ -61,13 +74,13 @@ function CreateOffer(props) {
     };
 
     useEffect(() => {
-
         if (serviceFee == null) {
             getCurrentServiceFee();
         }
-
     }, [serviceFee]);
 
+
+    // Land List element insertion
     const addLandToList = () => {
 
         console.log("X: %d, Y: %d", landXValue, landYValue);
@@ -84,7 +97,7 @@ function CreateOffer(props) {
                 // Coordinates not already inserted
                 const updatedCoords = currentOfferCoordinates;
                 updatedCoords.push({ x: landXValue, y: landYValue });
-                setCurrentOfferCoordinates(updatedCoords);
+                setCurrentOfferCoordinates([...updatedCoords]);
                 console.log(currentOfferCoordinates);
             } else {
                 console.log("Coordinates already inserted in the land list!");
@@ -95,6 +108,7 @@ function CreateOffer(props) {
         }
     }
 
+    // Land List element removal
     const removeLandFromList = () => {
 
         const landXToRemove = landXValue;
@@ -137,6 +151,9 @@ function CreateOffer(props) {
     };
 
 
+    // OFFER OPERATIONS
+    //
+    // Create new offer
     function createOffer() {
 
         var landIds = decodeOfferLands(currentOfferCoordinates);
@@ -146,6 +163,7 @@ function CreateOffer(props) {
         writeLandBlockSC.createNewOffer(landIds, blockPrice);
     }
 
+    // Declare deposit
     function declareBatchDeposit() {
         var landIds = decodeOfferLands(currentOfferCoordinates);
         writeLandBlockSC.declareBatchLandDeposit(landIds)
@@ -159,6 +177,7 @@ function CreateOffer(props) {
 
     }
 
+    // Confirm deposit
     function confirmBatchDeposit() {
         var landIds = decodeOfferLands(currentOfferCoordinates);
         writeLandBlockSC.confirmBatchLandDeposit(landIds)
@@ -170,6 +189,7 @@ function CreateOffer(props) {
             });
     }
 
+    // Send Lands
     function sendLands() {
         var landIds = decodeOfferLands(currentOfferCoordinates);
         var sendLandPromises = [];
@@ -212,19 +232,23 @@ function CreateOffer(props) {
                 Create new offer
             </Typography>
 
-            <GenericPopup
-                handleOpen={showPopup}
-                handleClose={handleClosePopup}
-                popupType="warning"
-                popupMessage="Testo di prova"
-                popupButtonMessage="Ok"
-                popupButtonAction={handleClosePopup} />
-
             {logLandNotFound ? getPopupContent(LAND_NOT_FOUND, logLandNotFound, setLogLandNotFound) : <></>}
             {logInvalidCoordinates ? getPopupContent(INVALID_COORDINATES, logInvalidCoordinates, setLogInvalidCoordinates) : <></>}
             {logCoordinateAlreadyInserted ? getPopupContent(COORDINATES_ALREADY_INSERTED, logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted) : <></>}
             {logNegativeCoordinate ? getPopupContent(NEGATIVE_COORDINATE, logNegativeCoordinate, setLogNegativeCoordinate) : <></>}
-            
+
+            {popupDeclareDeposit ?
+                <GenericPopup
+                    handleOpen={popupDeclareDeposit}
+                    handleClose={closePopupDeclareDeposit}
+                    popupType="normal"
+                    popupMessage="Testo di prova"
+                    popupButtonMessage="Ok"
+                    popupButtonAction={closePopupDeclareDeposit} />
+                :
+                <></>
+            }
+
             <Grid container spacing={5}>
                 <Grid item xs={6}>
 
@@ -280,7 +304,7 @@ function CreateOffer(props) {
                             </Grid>
 
 
-                            <Grid container direction='column' spacing={0.5} justifyContent='center' sx={{ mb: 2 }}>
+                            <Grid container direction='column' spacing={0.5} justifyContent='center' sx={{ mb: 3 }}>
                                 <Grid item xs={4}>
                                     <Typography variant='h6' >
                                         Price in RMRK:
@@ -306,37 +330,74 @@ function CreateOffer(props) {
                                     </Grid>
                                 </Grid>
                             </Grid>
+                            <Grid container direction='column' spacing={1} justifyContent='center' sx={{ mb: 2 }}>
+                                <Grid item xs={4}>
+                                    <Typography variant='h6' >
+                                        Deposit operations sequence:
+                                    </Typography>
+                                </Grid>
 
-                        </CardContent>
+                                <Grid item xs='auto' container spacing={2} direction='row' alignItems='center' >
+                                    <Grid item xs='auto'>
+                                        <Button onClick={setPopupDeclareDeposit} className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
+                                            Declare Deposit
+                                        </Button>
 
-                        <CardActions>
-                            <Grid container spacing={2} direction='column' alignItems='center' >
-                                <Grid item container direction='row' spacing={0} alignItems='center'>
-                                    <Grid item xs={4} align='center'>
-                                        <Button onClick={declareBatchDeposit} className='yellowButton' disabled={declareDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 4 }}>
-                                            Declare deposit
-                                        </Button>
                                     </Grid>
-                                    <Grid item xs={4} align='center'>
-                                        <Button className='yellowButton' disabled={!sendLandsButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 4 }}>
-                                            Send lands
-                                        </Button>
-                                    </Grid>
-                                    <Grid item xs={4} align='center'>
-                                        <Button className='yellowButton' disabled={!confirmDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 4 }}>
-                                            Confirm deposit
-                                        </Button>
+                                    <Grid item xs='auto'>
+                                        <Typography variant='body1' sx={{ fontSize: 14, fontWeight: 500 }} >
+                                            Step 1: declare the list of lands to deposit
+                                        </Typography>
                                     </Grid>
                                 </Grid>
-                                <Grid item>
-                                    <Button className='redWhiteButton' disabled={!createOfferButtonState} variant='outlined' size='medium' sx={{ fontWeight: 600, backgroundColor: '#cf2020', width: 500, height: 70, borderRadius: 4, border: '4px solid', }}>
-                                        Create offer
+
+                                <Grid item xs='auto' container spacing={2} direction='row' alignItems='center' >
+                                    <Grid item xs='auto'>
+                                        <Button className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
+                                            Send Lands
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs='auto'>
+                                        <Typography variant='body1' sx={{ fontSize: 14, fontWeight: 500 }} >
+                                            Step 2: send the declared lands
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+
+                                <Grid item xs='auto' container spacing={2} direction='row' alignItems='center' >
+                                    <Grid item xs='auto'>
+                                        <Button className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
+                                            Confirm Deposit
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs='auto'>
+                                        <Typography variant='body1' sx={{ fontSize: 14, fontWeight: 500 }} >
+                                            Step 3: confirm your deposit
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+
+                            </Grid>
+
+                            <Grid container direction='column' spacing={1} justifyContent='center' sx={{ mt: 5 }}>
+                                <Grid item xs={4}>
+                                    <Typography variant='h6' >
+                                        Final operation:
+                                    </Typography>
+                                </Grid>
+
+                                <Grid item xs='auto'>
+                                    <Button className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
+                                        Create Offer
                                     </Button>
                                 </Grid>
+
                             </Grid>
-                        </CardActions>
+                        </CardContent>
                     </Card>
                 </Grid >
+
+
                 <Grid item xs={6}>
                     <Card className='blueGradient' sx={{ p: 1.5, mb: 3, borderRadius: 3, boxShadow: 8, minHeight: 370 }}>
                         <CardContent>

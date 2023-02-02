@@ -79,6 +79,8 @@ function CreateOffer(props) {
         }
     }, [serviceFee]);
 
+
+    // Land List element insertion
     const addLandToList = () => {
 
         console.log("X: %d, Y: %d", landXValue, landYValue);
@@ -106,6 +108,7 @@ function CreateOffer(props) {
         }
     }
 
+    // Land List element removal
     const removeLandFromList = () => {
 
         const landXToRemove = landXValue;
@@ -148,6 +151,9 @@ function CreateOffer(props) {
     };
 
 
+    // OFFER OPERATIONS
+    //
+    // Create new offer
     function createOffer() {
 
         var landIds = decodeOfferLands(currentOfferCoordinates);
@@ -157,6 +163,7 @@ function CreateOffer(props) {
         writeLandBlockSC.createNewOffer(landIds, blockPrice);
     }
 
+    // Declare deposit
     function declareBatchDeposit() {
         var landIds = decodeOfferLands(currentOfferCoordinates);
         writeLandBlockSC.declareBatchLandDeposit(landIds)
@@ -170,6 +177,7 @@ function CreateOffer(props) {
 
     }
 
+    // Confirm deposit
     function confirmBatchDeposit() {
         var landIds = decodeOfferLands(currentOfferCoordinates);
         writeLandBlockSC.confirmBatchLandDeposit(landIds)
@@ -181,6 +189,7 @@ function CreateOffer(props) {
             });
     }
 
+    // Send Lands
     function sendLands() {
         var landIds = decodeOfferLands(currentOfferCoordinates);
         var sendLandPromises = [];

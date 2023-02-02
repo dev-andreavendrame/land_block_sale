@@ -40,7 +40,7 @@ function CreateOffer(props) {
     const [landYValue, setLandYValue] = useState(null);
 
     // Interface animation state
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(false);
 
 
     // Popup & log
@@ -74,11 +74,9 @@ function CreateOffer(props) {
     };
 
     useEffect(() => {
-
         if (serviceFee == null) {
             getCurrentServiceFee();
         }
-
     }, [serviceFee]);
 
     const addLandToList = () => {
@@ -97,7 +95,7 @@ function CreateOffer(props) {
                 // Coordinates not already inserted
                 const updatedCoords = currentOfferCoordinates;
                 updatedCoords.push({ x: landXValue, y: landYValue });
-                setCurrentOfferCoordinates(updatedCoords);
+                setCurrentOfferCoordinates([...updatedCoords]);
                 console.log(currentOfferCoordinates);
             } else {
                 console.log("Coordinates already inserted in the land list!");
@@ -465,40 +463,3 @@ function getEffectiveBlockPrice(rawPrice) {
 
     return parseFloat(rawPrice) * 10 ** 10;
 }
-
-
-
-/*
-
-    <CardActions>
-                            <Grid container spacing={2} direction='column' alignItems='center' >
-                                <Grid item container direction='row' spacing={0} alignItems='center'>
-                                    <Grid item xs={4} align='center'>
-                                        <Button onClick={declareBatchDeposit} className='yellowButton' disabled={declareDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 4 }}>
-                                            Declare deposit
-                                        </Button>
-                                    </Grid>
-                                    <Grid item xs={4} align='center'>
-                                        <Button className='yellowButton' disabled={!sendLandsButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 4 }}>
-                                            Send lands
-                                        </Button>
-                                    </Grid>
-                                    <Grid item xs={4} align='center'>
-                                        <Button className='yellowButton' disabled={!confirmDepositButtonState} variant='contained' size='medium' sx={{ fontWeight: 'bold', color: '#282c34', width: 100, height: 70, borderRadius: 4 }}>
-                                            Confirm deposit
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                                <Grid item>
-
-                                </Grid>
-                            </Grid>
-                            <Box display='flex'>
-                                <Button className='redWhiteButton' disabled={!createOfferButtonState} variant='outlined' size='medium' sx={{ fontWeight: 600, backgroundColor: '#cf2020', maxWidth: '100%', height: 70, borderRadius: 4, border: '4px solid', }}>
-                                    Create offer
-                                </Button>
-                            </Box>
-
-                        </CardActions>
-
-*/

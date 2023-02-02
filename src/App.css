@@ -144,15 +144,20 @@
 }
 
 .yellowButton  {
-  background-color: #FFC93C !important;
+  background-image: linear-gradient(to top, #f0b624, #ffdb80) !important;
+}
+.yellowButton:hover {
+  filter: brightness(90%);
 }
 .yellowButton:disabled {
-  background-color: #8d8d8d !important;
-  color: #696969 !important;
+  filter: grayscale();
 }
 
 .redButton  {
-  background-color: red !important;
+  background-image: linear-gradient(to top, red, #ff8080) !important;
+}
+.redButton:hover {
+  filter: brightness(85%);
 }
 
 

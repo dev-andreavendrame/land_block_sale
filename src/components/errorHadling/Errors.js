@@ -11,7 +11,7 @@ export function getPopupContent(errorCode, stateVariable, setStateFunction) {
     switch (errorCode) {
         case LAND_NOT_FOUND:
             return (<GenericLog
-                logType='danger'
+                logType='error'
                 logMessage={stateVariable}
                 logReset={setStateFunction} />);
         case INVALID_COORDINATES:

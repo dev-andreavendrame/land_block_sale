@@ -21,3 +21,14 @@ export function getEffectiveBlockPrice(rawPrice) {
 
     return parseFloat(rawPrice) * 10 ** 10;
 }
+
+export function getReadableLandsCoorinates(offerCoordinates) {
+
+    var text = "";
+    for (let i=0; i<offerCoordinates.length; i++) {
+        const x = parseInt(offerCoordinates[i]['x']);
+        const y = parseInt(offerCoordinates[i]['y']);
+        text = text + " (" + x + "," + y + ") ";
+    }
+    return text;
+}

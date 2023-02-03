@@ -19,6 +19,8 @@ function GenericPopup(props) {
 
         const popupType = props.popupType;
         const popupButtonAction = props.popupButtonAction;
+        const popupButtonMessage = props.popupButtonMessage;
+        const popupMessage = props.popupMessage;
 
         const typeText = {
             position: 'absolute',
@@ -36,12 +38,12 @@ function GenericPopup(props) {
                 <Grid container spacing={1} direction='column' alignItems='center'>
                     <Grid item xs={9}>
                         <Typography align='center' variant='body1' sx={{ p: 2, fontSize: 18, fontWeight: 600 }}>
-                            Lorem ipsum - questo testo serve puramente come prova. Il test è utile a capire come si presenta visivamente a schermo
+                            {popupMessage}
                         </Typography>
                     </Grid>
                     <Grid item xs={4}>
                         <Button onClick={popupButtonAction} className={'genericPopupButton genericPopupButton--' + popupType } variant='contained' size='medium' sx={{ mt: 2, borderRadius: 50 }}>
-                            Prova Prova
+                            {popupButtonMessage}
                         </Button>
                     </Grid>
                 </Grid>

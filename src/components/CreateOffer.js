@@ -2,14 +2,24 @@ import { ethers } from "ethers";
 import { writeLandBlockSC, landBlockCA, readLandBlockSC, smartContractSkybreach } from './LandBlockSale';
 import GenericPopup from './minorComponents/GenericPopup/GenericPopup';
 import { getPopupContent } from './errorHadling/Errors';
-import { getLandIdsFromCoordinates, getEffectiveBlockPrice } from "../logicUtils/SkybreachUtils";
+import { getLandIdsFromCoordinates, getEffectiveBlockPrice, getReadableLandsCoorinates } from "../logicUtils/SkybreachUtils";
 
 import { React, useEffect, useState, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Card, Collapse, CardContent, Typography, Box, Grid, TextField, Button, IconButton } from '@mui/material';
-import { COORDINATES_ALREADY_INSERTED, INVALID_COORDINATES, LAND_NOT_FOUND, NEGATIVE_COORDINATE, LAND_NOT_OWNED } from "./errorHadling/Errors";
-import { LAND_NOT_OWNED_ERROR, DEPOSIT_NOT_DECLARED, DEPOSIT_NOT_DONE_YET } from "./errorHadling/MetamaskErrors";
+import {
+    COORDINATES_ALREADY_INSERTED,
+    INVALID_COORDINATES,
+    LAND_NOT_FOUND,
+    NEGATIVE_COORDINATE,
+    LAND_NOT_OWNED,
+    OFFER_PRICE_NULL,
+    NOT_ENOUGHT_LANDS_IN_OFFER,
+    DEPOSIT_NOT_DECLARED,
+    DEPOSIT_NOT_DONE_YET
+} from "./errorHadling/Errors";
+import { LAND_NOT_OWNED_ERROR, REVERT_DEPOSIT_NOT_DONE_YET, NOT_LANDS_MIN_AMOUNT } from "./errorHadling/MetamaskErrors";
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -34,12 +44,11 @@ function CreateOffer(props) {
     const [createOfferButtonState, setCreateOfferButtonState] = useState(false);
 
     // Offer data
-    const inputLandIdsRef = useRef(null);
-    const inputPriceRef = useRef(null);
     const [currentOfferCoordinates, setCurrentOfferCoordinates] = useState([]);
 
     const [landXValue, setLandXValue] = useState(null);
     const [landYValue, setLandYValue] = useState(null);
+    const [rmrkPrice, setRMRKPrice] = useState(null);
 
     // Interface animation state
     const [isExpanded, setIsExpanded] = useState(false);
@@ -69,11 +78,13 @@ function CreateOffer(props) {
     const [logInvalidCoordinates, setLogInvalidCoordinates] = useState("");
     const [logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted] = useState("");
     const [logNegativeCoordinate, setLogNegativeCoordinate] = useState("");
+    const [logOfferPriceNull, setLogOfferPriceNull] = useState("");
 
     // Logs for Smart contract errors
     const [errorLandNotOwned, setErrorLandNotOwned] = useState("");
-    const [errorDepositNotDeclared, setErrorDepositNotDeclared] = useState("");
+    const [errorDepNotDecl, setErrorDepNotDecl] = useState("");
     const [errorNotDepositedYet, setErrorNotDepositedYet] = useState("");
+    const [errorNotEnoughLandsSelected, setErrorNotEnoughLandsSelected] = useState("");
 
     // collapsable elements
     const handleExpandClick = () => {
@@ -156,6 +167,10 @@ function CreateOffer(props) {
         setLandYValue(parseInt(event.target.value));
         console.log('value is:', event.target.value);
     };
+    const handleOfferPriceChange = event => {
+        setRMRKPrice(parseFloat(event.target.value));
+        console.log('RMRK price set for the offer is %f', rmrkPrice);
+    }
 
 
     // OFFER OPERATIONS
@@ -164,10 +179,30 @@ function CreateOffer(props) {
     function createOffer() {
 
         var landIds = getLandIdsFromCoordinates(currentOfferCoordinates);
-        var blockPrice = getEffectiveBlockPrice(inputPriceRef.current.value);
+        if (landIds === null) {
+            console.log("No lands specified");
+        }
+        if (rmrkPrice === null || Number.isNaN(rmrkPrice)) {
+            setLogOfferPriceNull("Offer price not defined");
+            setPopupCreateOffer(false);
+        }
+        var blockPrice = getEffectiveBlockPrice(rmrkPrice);
         console.log("Land ids: " + landIds + " offer price: " + blockPrice + " RMRK");
         // Execute transactions
-        writeLandBlockSC.createNewOffer(landIds, blockPrice);
+        writeLandBlockSC.createNewOffer(landIds, blockPrice)
+            .then(result => {
+                console.log("Transaction output: " + result);
+            })
+            .catch(error => {
+                if ((error.message).indexOf(NOT_LANDS_MIN_AMOUNT)) {
+                    // SHOW LOG ERROR
+                    console.log("EL ERROR");
+                    setErrorNotEnoughLandsSelected("You need to specify at least 2 lands in the offer");
+                    setErrorNotEnoughLandsSelected(false);
+                }
+                console.log(error);
+            });
+        setPopupCreateOffer(false);
     }
 
     // Declare deposit
@@ -198,20 +233,21 @@ function CreateOffer(props) {
                 console.log("Deposit result" + depositResult);
             })
             .catch(error => {
-                if ((error.message).indexOf(DEPOSIT_NOT_DECLARED)) {
+                if ((error['data']['message']).indexOf(DEPOSIT_NOT_DECLARED)) {
                     // SHOW LOG ERROR
-                    setErrorDepositNotDeclared("Deposit for the current lands not declared yet.");
+                    setErrorDepNotDecl("Deposit for the current lands not declared yet.");
+                    console.log("Deposit for the current lands not declared yet.");
                 }
-                if ((error.message).indexOf(DEPOSIT_NOT_DONE_YET)) {
+                if ((error['data']['message']).indexOf(DEPOSIT_NOT_DONE_YET)) {
                     // SHOW LOG ERROR
                     setErrorNotDepositedYet("Current lands not yet deposited.");
+                    console.log("Current lands not yet deposited.");
                 }
                 // Close popups
-                setErrorDepositNotDeclared(false);
-                setErrorNotDepositedYet(false);
-
-                console.log("Errore batch deposit: " + error);
+                console.log("Errore batch deposit: ");
+                console.log(error);
             });
+        setPopupConfirmDeposit(false);
     }
 
     // Send Lands
@@ -261,18 +297,21 @@ function CreateOffer(props) {
             {logInvalidCoordinates ? getPopupContent(INVALID_COORDINATES, logInvalidCoordinates, setLogInvalidCoordinates) : <></>}
             {logCoordinateAlreadyInserted ? getPopupContent(COORDINATES_ALREADY_INSERTED, logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted) : <></>}
             {logNegativeCoordinate ? getPopupContent(NEGATIVE_COORDINATE, logNegativeCoordinate, setLogNegativeCoordinate) : <></>}
+            {logOfferPriceNull ? getPopupContent(OFFER_PRICE_NULL, logOfferPriceNull, setLogOfferPriceNull) : <></>}
 
             {errorLandNotOwned ? getPopupContent(LAND_NOT_OWNED, errorLandNotOwned, setErrorLandNotOwned) : <></>}
-            {errorDepositNotDeclared ? getPopupContent(DEPOSIT_NOT_DECLARED, errorDepositNotDeclared, setErrorDepositNotDeclared) : <></>}
+            {errorDepNotDecl ? getPopupContent(DEPOSIT_NOT_DECLARED, errorDepNotDecl, setErrorDepNotDecl) : <></>}
             {errorNotDepositedYet ? getPopupContent(DEPOSIT_NOT_DONE_YET, errorNotDepositedYet, setErrorNotDepositedYet) : <></>}
+            {errorNotEnoughLandsSelected ? getPopupContent(NOT_ENOUGHT_LANDS_IN_OFFER, errorNotEnoughLandsSelected, setErrorNotEnoughLandsSelected) : <></>}
+
 
             {popupDeclareDeposit ?
                 <GenericPopup
                     handleOpen={popupDeclareDeposit}
                     handleClose={closePopupDeclareDeposit}
-                    popupType="normal"
-                    popupMessage="Testo di prova"
-                    popupButtonMessage="Ok"
+                    popupType="warning"
+                    popupMessage={"Confimr that you want to deposit the " + getReadableLandsCoorinates(currentOfferCoordinates) + " lands"}
+                    popupButtonMessage="Confirm declaration"
                     popupButtonAction={declareBatchDeposit} />
                 :
                 <></>
@@ -281,10 +320,21 @@ function CreateOffer(props) {
                 <GenericPopup
                     handleOpen={popupConfirmDeposit}
                     handleClose={closePopupConfirmDeposit}
-                    popupType="normal"
-                    popupMessage="Testo di prova"
-                    popupButtonMessage="Ok"
+                    popupType="warning"
+                    popupMessage={"You are confirming that you have deposited the following lands:\n" + getReadableLandsCoorinates(currentOfferCoordinates)}
+                    popupButtonMessage="Confirm the deposit"
                     popupButtonAction={confirmBatchDeposit} />
+                :
+                <></>
+            }
+            {popupCreateOffer ?
+                <GenericPopup
+                    handleOpen={popupCreateOffer}
+                    handleClose={closePopupCreateOffer}
+                    popupType="warning"
+                    popupMessage={"Confirm to create an offer of " + rmrkPrice + " RMRK with " + currentOfferCoordinates.length + " lands"}
+                    popupButtonMessage="Confirm"
+                    popupButtonAction={createOffer} />
                 :
                 <></>
             }
@@ -313,7 +363,7 @@ function CreateOffer(props) {
                                             onChange={handleXChange}
                                             value={landXValue}
                                             placeholder="X"
-                                            sx={{ maxWidth: 100 }}
+                                            sx={{ maxWidth: 1000 }}
                                         />
                                     </Grid>
                                     <Grid item xs='auto'>
@@ -327,7 +377,7 @@ function CreateOffer(props) {
                                             onChange={handleYChange}
                                             value={landYValue}
                                             placeholder="Y"
-                                            sx={{ maxWidth: 100 }}
+                                            sx={{ maxWidth: 1000 }}
                                         />
                                     </Grid>
                                     <Grid item xs='auto'>
@@ -359,7 +409,8 @@ function CreateOffer(props) {
                                             required
                                             id="rmrk_price"
                                             name="rmrk_price"
-                                            onChange={inputPriceRef}
+                                            value={rmrkPrice}
+                                            onChange={handleOfferPriceChange}
                                             placeholder="RMRK amount"
                                         />
                                     </Grid>
@@ -427,7 +478,7 @@ function CreateOffer(props) {
                                 </Grid>
 
                                 <Grid item xs='auto'>
-                                    <Button className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
+                                    <Button onClick={setPopupCreateOffer} className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
                                         Create Offer
                                     </Button>
                                 </Grid>

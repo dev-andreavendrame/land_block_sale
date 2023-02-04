@@ -13,9 +13,11 @@ import { Box, IconButton, Button } from '@mui/material';
 import LandListEntry from './minorComponents/LandListEntry';
 
 // Blockchain imports
-import { landBlockSalesReadable } from '../components/smartContracts/MoonriverConfig';
+import { landBlockSalesReadable, LAND_BLOCK_SALES_ADDRESS, xcRMRKReadable, xcRMRKWritable } from '../components/smartContracts/MoonriverConfig';
 import { ethers } from "ethers";
 import { CHUNKY_LAND_IDS, GIFT_LAND_IDS } from './minorComponents/SkybreachTempData';
+import GenericPopup from './minorComponents/GenericPopup/GenericPopup';
+import { writeLandBlockSC } from './LandBlockSale';
 
 
 const ExpandMore = styled((props) => {
@@ -53,8 +55,19 @@ function OfferCard(props) {
     // Interface animation state
     const [expanded, setExpanded] = useState(false);
 
+    // Popups & Logs
+    const [popupBuyOffer, setPopupBuyOffer] = useState(false);
+    const [popupApproveBuy, setPopupApproveBuy] = useState(false);
+
     const handleExpandClick = () => {
         setExpanded(!expanded);
+    };
+
+    const closePopupBuyOffer = () => {
+        setPopupBuyOffer(false);
+    };
+    const closePopupApproveBuy = () => {
+        setPopupApproveBuy(false);
     };
 
     useEffect(() => {
@@ -92,6 +105,29 @@ function OfferCard(props) {
         }
     });
 
+    function approveXCRMRK(offerPrice) {
+        console.log("Offer price: %f RMRK", offerPrice);
+        xcRMRKWritable.approve(LAND_BLOCK_SALES_ADDRESS, offerPrice)
+            .then(response => {
+                console.log(response);
+            }).catch(error => {
+                console.log("Error approving XCRMRK");
+                console.log(error);
+                setPopupApproveBuy(false);
+            });
+        setPopupApproveBuy(false);
+    }
+
+    function buyLandBlock() {
+        writeLandBlockSC.buyLandBlock(currentOfferId)
+            .then(buyResponseResult => {
+                console.log("buyResponseResult: " + buyResponseResult);
+            })
+            .catch(buyError => {
+                console.log("Buy error: " + buyError);
+            });
+        setPopupBuyOffer(false);
+    }
 
 
     return (
@@ -119,6 +155,30 @@ function OfferCard(props) {
                         <ExpandMoreIcon />
                     </ExpandMore>
                 </Box>
+
+                {popupBuyOffer ?
+                    <GenericPopup
+                        handleOpen={popupBuyOffer}
+                        handleClose={closePopupBuyOffer}
+                        popupType="warning"
+                        popupMessage={"Confirm that you want to deposit the "}
+                        popupButtonMessage="Confirm declaration"
+                        popupButtonAction={buyLandBlock()} />
+                    :
+                    <></>
+                }
+                {popupApproveBuy ?
+                    <GenericPopup
+                        handleOpen={popupApproveBuy}
+                        handleClose={closePopupApproveBuy}
+                        popupType="warning"
+                        popupMessage={"Confirm that you want to approve the smart contract to spend " + (parseFloat(blockPrice) / (10 ** 10)) + " RMRK to buy this land block"}
+                        popupButtonMessage="Approve"
+                        popupButtonAction={approveXCRMRK(blockPrice)} />
+                    :
+                    <></>
+                }
+
                 <Collapse in={expanded} timeout="auto" >
                     {
                         landIdsInOffer.map((landId) => {
@@ -173,7 +233,10 @@ function OfferCard(props) {
                             </Button>
                         </Box> :
                         <Box display='flex'>
-                            <Button className='yellowButton' variant='contained' sx={{ mt: 2, fontWeight: 'bold', color: '#282c34', width: 100 }}>
+                            <Button onClick={setPopupApproveBuy} className='yellowButton' variant='contained' sx={{ mt: 2, fontWeight: 'bold', color: '#282c34', width: 100 }}>
+                                Approve buy
+                            </Button>
+                            <Button onClick={setPopupBuyOffer} className='yellowButton' variant='contained' sx={{ mt: 2, fontWeight: 'bold', color: '#282c34', width: 100 }}>
                                 Buy
                             </Button>
                         </Box>
@@ -203,7 +266,6 @@ function hasIt(landsOwned) {
     for (let i = 0; i < landsOwned.length; i++) {
         const x = landsOwned[i] % 256;
         const y = landsOwned[i] / 256;
-        console.log("X: %d, Y: %d", x, y);
         if (hadAdjacencyBonus(x, y, landsOwned)) {
             return true;
         }
@@ -214,9 +276,6 @@ function hasIt(landsOwned) {
 function hadAdjacencyBonus(a, b, landsOwned) {
     const x = parseInt(a);
     const y = parseInt(b);
-    console.log("x: %d, y: %d", x, y);
-    console.log("Land corrente: " + (x+y*256));
-    console.log("Land in offerta: " + landsOwned);
     for (let i = x - 1; i <= x + 1; i++) {
         for (let j = y - 1; j <= y + 1; j++) {
             const currentLand = i + j * 256;

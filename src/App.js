@@ -1,26 +1,21 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 
 import { Box, AppBar, Typography, Button } from '@mui/material';
 import MButton from '@mui/material/Button';
 
-import { readLandBlockSC, landBlockCA, smartContractXCRMRK } from './components/LandBlockSale';
 import CreateOffer from './components/CreateOffer';
 import WithdrawComponent from './components/WithdrawComponent';
-import MyOffers from './components/MyOffers';
 
 import SRSlogo from './components/images/SRS_logo.png';
-import OfferCard from './components/OfferCard';
 
 // New imports
 
 import HandleOffers from './components/HandleOffers';
-import DepositedLandCard from './components/DepositedLandCard';
 
 //added react router for more pages
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 function App() {
 
@@ -166,18 +161,6 @@ function App() {
       );
     }
   }
-
-
-  function approveXCRMRK() {
-    const offerCreationFee = 5 * 10 ** 9;
-    Promise.all([smartContractXCRMRK.approve(landBlockCA, offerCreationFee)
-    ]).then(allResponses => { console.log("Risultato 1: " + allResponses[0]) });
-  }
-
-  useEffect(() => {
-
-  }, []);
-
 
   // VARIOUS STYLES
   const routeLinkStyle = {

@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { Box, IconButton, Button } from '@mui/material';
+import { Box, IconButton, Button, Grid } from '@mui/material';
 import LandListEntry from './minorComponents/LandListEntry';
 
 // Blockchain imports
@@ -163,7 +163,7 @@ function OfferCard(props) {
                         popupType="warning"
                         popupMessage={"Confirm that you want to deposit the "}
                         popupButtonMessage="Confirm declaration"
-                        popupButtonAction={buyLandBlock()} />
+                        popupButtonAction={buyLandBlock} />
                     :
                     <></>
                 }
@@ -174,7 +174,7 @@ function OfferCard(props) {
                         popupType="warning"
                         popupMessage={"Confirm that you want to approve the smart contract to spend " + (parseFloat(blockPrice) / (10 ** 10)) + " RMRK to buy this land block"}
                         popupButtonMessage="Approve"
-                        popupButtonAction={approveXCRMRK(blockPrice)} />
+                        popupButtonAction={approveXCRMRK} />
                     :
                     <></>
                 }
@@ -232,14 +232,21 @@ function OfferCard(props) {
                                 Cancel
                             </Button>
                         </Box> :
-                        <Box display='flex'>
-                            <Button onClick={setPopupApproveBuy} className='yellowButton' variant='contained' sx={{ mt: 2, fontWeight: 'bold', color: '#282c34', width: 100 }}>
-                                Approve buy
-                            </Button>
-                            <Button onClick={setPopupBuyOffer} className='yellowButton' variant='contained' sx={{ mt: 2, fontWeight: 'bold', color: '#282c34', width: 100 }}>
-                                Buy
-                            </Button>
-                        </Box>
+
+
+                        <Grid container direction='column' spacing={1} justifyContent='center'>
+                            <Grid item xs='auto'>
+                                <Button onClick={setPopupApproveBuy} className='yellowButton' variant='contained' size='small' sx={{ mt: 2, fontWeight: 'bold', color: '#282c34', width: 100 }} noWrap>
+                                    Approve purchase
+                                </Button>
+                            </Grid>
+
+                            <Grid item xs='auto'>
+                                <Button onClick={setPopupBuyOffer} className='yellowButton' variant='contained' size='small' sx={{ fontWeight: 'bold', color: '#282c34', width: 100 }}>
+                                    Buy
+                                </Button>
+                            </Grid>
+                        </Grid>
                     }
                 </Box>
             </CardActions>

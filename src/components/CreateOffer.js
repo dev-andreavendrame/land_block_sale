@@ -40,9 +40,9 @@ function CreateOffer(props) {
     // Offer data
     const [currentOfferCoordinates, setCurrentOfferCoordinates] = useState([]);
 
-    const [landXValue, setLandXValue] = useState("");
-    const [landYValue, setLandYValue] = useState("");
-    const [rmrkPrice, setRMRKPrice] = useState("");
+    const [landXValue, setLandXValue] = useState(NaN);
+    const [landYValue, setLandYValue] = useState(NaN);
+    const [rmrkPrice, setRMRKPrice] = useState(NaN);
 
     // Interface animation state
     const [isExpanded, setIsExpanded] = useState(true);
@@ -386,7 +386,7 @@ function CreateOffer(props) {
                                             onChange={handleXChange}
                                             value={landXValue}
                                             placeholder="X"
-                                            sx={{ maxWidth: 1000 }}
+                                            sx={{ maxWidth: 100 }}
                                         />
                                     </Grid>
                                     <Grid item xs='auto'>
@@ -400,7 +400,7 @@ function CreateOffer(props) {
                                             onChange={handleYChange}
                                             value={landYValue}
                                             placeholder="Y"
-                                            sx={{ maxWidth: 1000 }}
+                                            sx={{ maxWidth: 100 }}
                                         />
                                     </Grid>
                                     <Grid item xs='auto'>

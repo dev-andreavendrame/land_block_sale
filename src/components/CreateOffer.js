@@ -9,17 +9,13 @@ import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Card, Collapse, CardContent, Typography, Box, Grid, TextField, Button, IconButton } from '@mui/material';
 import {
-    COORDINATES_ALREADY_INSERTED,
-    INVALID_COORDINATES,
-    LAND_NOT_FOUND,
-    NEGATIVE_COORDINATE,
-    LAND_NOT_OWNED,
-    OFFER_PRICE_NULL,
-    NOT_ENOUGHT_LANDS_IN_OFFER,
-    DEPOSIT_NOT_DECLARED,
-    DEPOSIT_NOT_DONE_YET
-} from "./errorHadling/Errors";
-import { LAND_NOT_OWNED_ERROR, REVERT_DEPOSIT_NOT_DONE_YET, NOT_LANDS_MIN_AMOUNT } from "./errorHadling/MetamaskErrors";
+    REVERT_LAND_NOT_OWNED_ERROR,
+    REVERT_DEPOSIT_NOT_DONE_YET,
+    REVERT_NOT_LANDS_MIN_AMOUNT,
+    REVERT_NOT_LAND_OWNER,
+    REVERT_DEPOSIT_NOT_DECLARED,
+    REVERT_NOT_ALL_DEPOSITED
+} from "./errorHadling/MetamaskErrors";
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -38,20 +34,18 @@ function CreateOffer(props) {
     const [blockPrice, setBlockPrice] = useState(-1);
     const [serviceFee, setServiceFee] = useState(null);
 
-    const [declareDepositButtonState, setDeclareDepositButtonState] = useState(true);
-    const [sendLandsButtonState, setSendLandsButtonState] = useState(false);
-    const [confirmDepositButtonState, setConfirmDepositButtonState] = useState(false);
-    const [createOfferButtonState, setCreateOfferButtonState] = useState(false);
+    const [sendLandsButtonEnabled, setSendLandsButtonEnabled] = useState(false);
+    const [confirmDepositButtonEnabled, setConfirmDepositButtonEnabled] = useState(false);
 
     // Offer data
     const [currentOfferCoordinates, setCurrentOfferCoordinates] = useState([]);
 
-    const [landXValue, setLandXValue] = useState(null);
-    const [landYValue, setLandYValue] = useState(null);
-    const [rmrkPrice, setRMRKPrice] = useState(null);
+    const [landXValue, setLandXValue] = useState("");
+    const [landYValue, setLandYValue] = useState("");
+    const [rmrkPrice, setRMRKPrice] = useState("");
 
     // Interface animation state
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(true);
 
 
     // Popup & log
@@ -79,12 +73,15 @@ function CreateOffer(props) {
     const [logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted] = useState("");
     const [logNegativeCoordinate, setLogNegativeCoordinate] = useState("");
     const [logOfferPriceNull, setLogOfferPriceNull] = useState("");
+    const [logNoLandsInserted, setLogNoLandsInserted] = useState("");
 
     // Logs for Smart contract errors
     const [errorLandNotOwned, setErrorLandNotOwned] = useState("");
     const [errorDepNotDecl, setErrorDepNotDecl] = useState("");
     const [errorNotDepositedYet, setErrorNotDepositedYet] = useState("");
     const [errorNotEnoughLandsSelected, setErrorNotEnoughLandsSelected] = useState("");
+    const [errorNotLandOwner, setErrorNotLandOwner] = useState("");
+    const [errorNotAllDeposited, setErrorNotAllDeposited] = useState("");
 
     // collapsable elements
     const handleExpandClick = () => {
@@ -149,7 +146,7 @@ function CreateOffer(props) {
         if (indexToRemove === -1) {
             console.log("Land to remove not found!");
             // MOSTRARE POPUP NOT FOUND (WARNING)
-            setLogLandNotFound("Land not found");
+            setLogLandNotFound("Land to remove not found");
         } else {
             console.log("Land removed!");
             // MOSTRARE POPUP LAND REMOVED (SUCCESS)
@@ -189,31 +186,39 @@ function CreateOffer(props) {
         var blockPrice = getEffectiveBlockPrice(rmrkPrice);
         console.log("Land ids: " + landIds + " offer price: " + blockPrice + " RMRK");
         // Execute transactions
-        writeLandBlockSC.createNewOffer(landIds, blockPrice)
+        writeLandBlockSC.createNewOffer(landIds, "" + blockPrice)
             .then(result => {
                 console.log("Transaction output: " + result);
             })
             .catch(error => {
-                if ((error.message).indexOf(NOT_LANDS_MIN_AMOUNT)) {
+                console.log("Errore");
+                if ((error['data']['message']).indexOf(REVERT_NOT_LANDS_MIN_AMOUNT)) {
                     // SHOW LOG ERROR
-                    console.log("EL ERROR");
                     setErrorNotEnoughLandsSelected("You need to specify at least 2 lands in the offer");
-                    setErrorNotEnoughLandsSelected(false);
+                }
+                if ((error['data']['message']).indexOf(REVERT_NOT_ALL_DEPOSITED)) {
+                    // SHOW LOG ERROR
+                    setErrorNotAllDeposited("You haven't deposited all the lands inserted");
                 }
                 console.log(error);
             });
         setPopupCreateOffer(false);
     }
 
-    // Declare deposit
+    // errorsit
     function declareBatchDeposit() {
         var landIds = getLandIdsFromCoordinates(currentOfferCoordinates);
+        if (landIds.length < 1) {
+            setLogNoLandsInserted("You must add some land coordinates before procede!");
+            setPopupDeclareDeposit(false);
+            return;
+        }
         writeLandBlockSC.declareBatchLandDeposit(landIds)
             .then(depositBatchResult => {
                 console.log("Deposit batch result: " + depositBatchResult);
             })
             .catch(error => {
-                if ((error.message).indexOf(LAND_NOT_OWNED_ERROR)) {
+                if ((error['data']['message']).indexOf(REVERT_LAND_NOT_OWNED_ERROR)) {
                     // SHOW LOG ERROR
                     setErrorLandNotOwned("One or more land inserted not owned");
                 }
@@ -233,12 +238,12 @@ function CreateOffer(props) {
                 console.log("Deposit result" + depositResult);
             })
             .catch(error => {
-                if ((error['data']['message']).indexOf(DEPOSIT_NOT_DECLARED)) {
+                if ((error['data']['message']).indexOf(REVERT_DEPOSIT_NOT_DECLARED)) {
                     // SHOW LOG ERROR
                     setErrorDepNotDecl("Deposit for the current lands not declared yet.");
                     console.log("Deposit for the current lands not declared yet.");
                 }
-                if ((error['data']['message']).indexOf(DEPOSIT_NOT_DONE_YET)) {
+                if ((error['data']['message']).indexOf(REVERT_DEPOSIT_NOT_DONE_YET)) {
                     // SHOW LOG ERROR
                     setErrorNotDepositedYet("Current lands not yet deposited.");
                     console.log("Current lands not yet deposited.");
@@ -262,9 +267,14 @@ function CreateOffer(props) {
                 console.log(allResponses);
                 console.log("Land da depositare: " + landIds.length + "\nPromises number: " + sendLandPromises.length);
             })
-            .catch(errors => {
-                console.error(errors);
+            .catch(error => {
+                console.log(error);
+                if ((error['data']['message']).indexOf(REVERT_NOT_LAND_OWNER)) {
+                    console.log("You don't own one or more lands");
+                    setErrorNotLandOwner("You don't own one or more lands");
+                }
             });
+        setPopupSendLands(false);
     }
 
     function getCurrentServiceFee() {
@@ -293,26 +303,39 @@ function CreateOffer(props) {
                 Create new offer
             </Typography>
 
-            {logLandNotFound ? getPopupContent(LAND_NOT_FOUND, logLandNotFound, setLogLandNotFound) : <></>}
-            {logInvalidCoordinates ? getPopupContent(INVALID_COORDINATES, logInvalidCoordinates, setLogInvalidCoordinates) : <></>}
-            {logCoordinateAlreadyInserted ? getPopupContent(COORDINATES_ALREADY_INSERTED, logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted) : <></>}
-            {logNegativeCoordinate ? getPopupContent(NEGATIVE_COORDINATE, logNegativeCoordinate, setLogNegativeCoordinate) : <></>}
-            {logOfferPriceNull ? getPopupContent(OFFER_PRICE_NULL, logOfferPriceNull, setLogOfferPriceNull) : <></>}
+            {logLandNotFound ? getPopupContent("warning", logLandNotFound, setLogLandNotFound) : <></>}
+            {logInvalidCoordinates ? getPopupContent("danger", logInvalidCoordinates, setLogInvalidCoordinates) : <></>}
+            {logCoordinateAlreadyInserted ? getPopupContent("warning", logCoordinateAlreadyInserted, setLogCoordinateAlreadyInserted) : <></>}
+            {logNegativeCoordinate ? getPopupContent("error", logNegativeCoordinate, setLogNegativeCoordinate) : <></>}
+            {logOfferPriceNull ? getPopupContent("error", logOfferPriceNull, setLogOfferPriceNull) : <></>}
+            {logNoLandsInserted ? getPopupContent("error", logNoLandsInserted, setLogNoLandsInserted) : <></>}
 
-            {errorLandNotOwned ? getPopupContent(LAND_NOT_OWNED, errorLandNotOwned, setErrorLandNotOwned) : <></>}
-            {errorDepNotDecl ? getPopupContent(DEPOSIT_NOT_DECLARED, errorDepNotDecl, setErrorDepNotDecl) : <></>}
-            {errorNotDepositedYet ? getPopupContent(DEPOSIT_NOT_DONE_YET, errorNotDepositedYet, setErrorNotDepositedYet) : <></>}
-            {errorNotEnoughLandsSelected ? getPopupContent(NOT_ENOUGHT_LANDS_IN_OFFER, errorNotEnoughLandsSelected, setErrorNotEnoughLandsSelected) : <></>}
-
+            {errorLandNotOwned ? getPopupContent("error", errorLandNotOwned, setErrorLandNotOwned) : <></>}
+            {errorDepNotDecl ? getPopupContent("error", errorDepNotDecl, setErrorDepNotDecl) : <></>}
+            {errorNotDepositedYet ? getPopupContent("error", errorNotDepositedYet, setErrorNotDepositedYet) : <></>}
+            {errorNotEnoughLandsSelected ? getPopupContent("warning", errorNotEnoughLandsSelected, setErrorNotEnoughLandsSelected) : <></>}
+            {errorNotLandOwner ? getPopupContent("error", errorNotLandOwner, setErrorNotLandOwner) : <></>}
+            {errorNotAllDeposited ? getPopupContent("error", errorNotAllDeposited, setErrorNotAllDeposited) : <></>}
 
             {popupDeclareDeposit ?
                 <GenericPopup
                     handleOpen={popupDeclareDeposit}
                     handleClose={closePopupDeclareDeposit}
                     popupType="warning"
-                    popupMessage={"Confimr that you want to deposit the " + getReadableLandsCoorinates(currentOfferCoordinates) + " lands"}
+                    popupMessage={"Confirm that you want to deposit the " + getReadableLandsCoorinates(currentOfferCoordinates) + " lands"}
                     popupButtonMessage="Confirm declaration"
                     popupButtonAction={declareBatchDeposit} />
+                :
+                <></>
+            }
+            {popupSendLands ?
+                <GenericPopup
+                    handleOpen={popupSendLands}
+                    handleClose={closePopupSendLands}
+                    popupType="warning"
+                    popupMessage={"Confirming you will send the following lands to the smart contract" + getReadableLandsCoorinates(currentOfferCoordinates)}
+                    popupButtonMessage="Send lands"
+                    popupButtonAction={sendLands} />
                 :
                 <></>
             }
@@ -431,8 +454,9 @@ function CreateOffer(props) {
                                 <Grid item xs='auto' container spacing={2} direction='row' alignItems='center' >
                                     <Grid item xs='auto'>
                                         <Button onClick={setPopupDeclareDeposit} className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
-                                            Declare Deposit
+                                            Declare deposit
                                         </Button>
+
 
                                     </Grid>
                                     <Grid item xs='auto'>
@@ -444,7 +468,7 @@ function CreateOffer(props) {
 
                                 <Grid item xs='auto' container spacing={2} direction='row' alignItems='center' >
                                     <Grid item xs='auto'>
-                                        <Button className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
+                                        <Button onClick={setPopupSendLands} className='yellowButton' variant='contained' sx={{ width: 180, fontWeight: 'bold', color: '#282c34' }}>
                                             Send Lands
                                         </Button>
                                     </Grid>
@@ -507,9 +531,9 @@ function CreateOffer(props) {
                             </Box>
                             <Collapse in={isExpanded} timeout="auto" >
                                 {
-                                    currentOfferCoordinates.map((coordinates) => {
+                                    currentOfferCoordinates.map((coordinates, key) => {
                                         return (
-                                            <Typography variant='h6' color='#555555' >
+                                            <Typography variant='h6' color='#555555' key={key} >
                                                 {"X: " + coordinates['x'] + ", Y: " + coordinates['y']}
                                             </Typography>
                                         );

@@ -6,3 +6,4 @@ export const REVERT_NOT_LAND_OWNER = "User is not land owner";
 export const REVERT_NOT_ALL_DEPOSITED = "You haven't deposited all the lands";
 export const REVERT_MIN_ALLOWANCE_NOT_MET = "Minumum allowance to buy the block not met";
 export const REVERT_DISPATCH = "Dispatched call failed with error";
+export const REVERT_OFFER_NOT_OWNED = "This offer is not created by you";

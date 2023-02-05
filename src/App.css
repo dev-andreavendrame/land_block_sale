@@ -117,3 +117,122 @@
 .small_container {
   width: 100px;
 }
+
+
+
+
+
+
+
+
+.blueButton {
+  color: #0081c9 !important;
+}
+
+.redWhiteButton {
+  color: #fff !important;
+}
+.redWhiteButton:hover {
+  background-color: #940000 !important;
+  border: 0px solid !important;
+}
+.redWhiteButton:disabled {
+  background-color: #b6b6b6 !important;
+  color: #8d8d8d !important;
+  border: 4px solid !important;
+  border-color: #8d8d8d !important;
+}
+
+.yellowButton  {
+  background-image: linear-gradient(to top, #f0b624, #ffdb80) !important;
+}
+.yellowButton:hover {
+  filter: brightness(90%);
+}
+.yellowButton:disabled {
+  filter: grayscale();
+}
+
+.redButton  {
+  background-image: linear-gradient(to top, red, #ff8080) !important;
+}
+.redButton:hover {
+  filter: brightness(85%);
+}
+
+
+.blueGradient {
+  background: linear-gradient(0deg, #5BC0F8, #86E5FF);
+}
+
+.lightGreyGradient {
+  background: linear-gradient(180deg, #b6b6b633, transparent);
+}
+
+
+.blueGradientText {
+  background: linear-gradient(0deg, #209de0, #86E5FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.blueGradientButton {
+  background-image: linear-gradient(to top, #209de0, #86E5FF) !important;
+  transition: all .2s ease-in-out !important;
+}
+.blueGradientButton:hover {
+  transform: scale(1.1);
+}
+.blueGradientButton--navigation:hover {
+  filter: drop-shadow(0px 0px 20px black);
+  filter: brightness(85%);
+}
+.blueGradientButton:disabled {
+  filter: grayscale();
+}
+
+.discardButton {
+  border: 2px solid red !important;
+}
+.discardButton:hover {
+  background-color: red !important;
+  color: white !important;
+}
+.discardButton:active {
+  background-color: rgb(155, 0, 0) !important;
+  border-color:rgb(155, 0, 0) !important;
+}
+
+
+.fullPage {
+  height: 100%;
+}
+.partialPage {
+  height: 80%;
+}
+
+
+.validInput {
+  border: 1px green;
+}
+.invalidInput {
+  border: 1px red;
+}
+
+/*
+
+  /-------------------------/
+  /----- Color Palette -----/
+  /-------------------------/
+
+  0081C9  - Sea Blue
+  5BC0F8  - Clear Sky
+  86E5FF  - Cold Sky
+  FFC93C  - Crayon Sun
+
+  696969  - Medium Grey
+  8d8d8d  - Light Grey
+  b6b6b6  - White Grey
+
+*/

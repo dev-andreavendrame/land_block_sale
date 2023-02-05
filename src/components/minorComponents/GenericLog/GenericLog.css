@@ -1,0 +1,23 @@
+.fadingLog {
+    opacity: 1;
+    transition: all .5s ease-in-out !important;
+}
+
+.fadingLog.hidden {
+    opacity: 0;
+}
+
+.logBackground {
+    background-image: linear-gradient(to top, #000000, #00000000 ) !important;
+    transition-duration: 3.1s !important;
+    transition-property: all; 
+    animation: moveUpDown 3.1s !important;
+}
+
+@keyframes moveUpDown {
+    0%{transform: translate(-50%, 100%)}
+    15%{transform: translate(-50%, -50%)}
+    85%{transform: translate(-50%, -50%)}
+    100%{transform: translate(-50%, 100%)}
+}
+

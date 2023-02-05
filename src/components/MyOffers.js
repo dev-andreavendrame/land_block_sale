@@ -2,7 +2,9 @@ import { React, useEffect, useState, useRef } from 'react';
 import { readLandBlockSC, writeLandBlockSC, LAND_BLOCK_ABI, landBlockCA } from './LandBlockSale';
 import { decodeLandIdsFromCall } from './Block';
 
-function HandleMyOffers(props) {
+import { Box } from '@mui/material';
+
+function MyOffers(props) {
     // Wallet address connected
     const [accountAddress, setAccountAddress] = useState("");
 
@@ -46,6 +48,7 @@ function HandleMyOffers(props) {
     }, [accountAddress, count]);
 
     return (
+
         <div class="card bg-info">
             <div class="card-body">
                 <h3 class="card-title">Handle my offers</h3>
@@ -66,7 +69,7 @@ function HandleMyOffers(props) {
     }
 
 
-} export default HandleMyOffers;
+} export default MyOffers;
 
 function getFormattedPrice(rawPrice) {
     return rawPrice / 10 ** 10;

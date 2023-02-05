@@ -1,98 +1,75 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { ethers } from "ethers";
-import { useEffect, useState, useRef } from 'react';
-import { readLandBlockSC, writeLandBlockSC, landBlockCA, smartContractXCRMRK } from './components/LandBlockSale';
+import { useState, useRef } from 'react';
+
+import { Box, AppBar, Typography, Button } from '@mui/material';
+import MButton from '@mui/material/Button';
+
 import CreateOffer from './components/CreateOffer';
 import WithdrawComponent from './components/WithdrawComponent';
-import Block from './components/Block';
-import HandleMyOffers from './components/MyOffers';
+
+import SRSlogo from './components/images/SRS_logo.png';
+
+// New imports
+
+import HandleOffers from './components/HandleOffers';
+
+//added react router for more pages
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 function App() {
 
-  const [actualActiveOffers, setActualActiveOffers] = useState([]);
-  const [accountAddress, setAccountAddress] = useState("click to connect -->");
+  // Account state
+  const [currentAccount, setCurrentAccount] = useState("");
   var activeOffersNumber = useRef(-1);
 
-  function handleClick() {
-    readLandBlockSC.getActiveOffers().then(offerIds => {
-      setActualActiveOffers(offerIds);
-      // Change state
-      activeOffersNumber = offerIds.length;
-      console.log("IDs offerte ricevute: " + offerIds);
-    }).catch(error => {
-      console.log("Errore: " + error);
-      setActualActiveOffers([]);
-    });
+  // Appbar 
+  function SkybreachAppBar() {
+
+    return (
+      <AppBar position="static" sx={{ height: 130, backgroundColor: "#282c34", boxShadow: 24 }}>
+
+        <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ height: 100, mt: 3 }} >
+          <Box display='inline-flex' sx={{ ml: 4, alignItems: "center" }}>
+            <Box sx={{ minWidth: 100, maxWidth: 150, minHeight: 100, maxHeight: 150, mt: 2, elevation: 5, borderRadius: 100, boxShadow: 12, }} >
+              <img src={SRSlogo} alt="SRS logo" class="img-fluid" />
+            </Box>
+            <Box >
+              <Typography sx={{ ml: 2, fontWeight: 'bold', fontSize: 'clamp(26px, 4vw, 40px)', textAlign: 'left' }} variant='h4' >
+                Skybreach tools
+              </Typography>
+              <Typography sx={{ ml: 2, mb: 3, fontWeight: 'normal', fontSize: 'clamp(18px, 4vw, 30px)', textAlign: 'left' }} variant='h5'>
+                Land Block Sale
+              </Typography>
+            </Box>
+            <Box sx={{ ml: 5, mb: 2 }}>
+              {updateConnectedWallet()}
+            </Box>
+          </Box>
+
+          <Box sx={{ minWidth: 50 }} />
+
+          <Box display="inline-flex" gap={3} sx={{ mr: 5, mb: 2, alignItems: "center", justifyContent: "flex-end", minHeight: 10 }}>
+            <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ width: 200, maxHeight: 100, borderRadius: 10 }}>
+              <Link to={'/Landmanagement'} style={routeLinkStyle}>
+                Land Management
+              </Link>
+            </Button>
+            <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ width: 200, maxHeight: 100, borderRadius: 10 }}>
+              <Link to={'/Offermarket'} style={routeLinkStyle}>
+                Offer
+                <br />
+                Market
+              </Link>
+            </Button>
+          </Box>
+        </Box>
+      </AppBar>
+    );
   }
 
-  // Metamask button
-  const buttonWalletConnectionHandler = () => {
-    if (window.ethereum) {
-      // Connecting to wallet
-      window.ethereum
-        .request({ method: "eth_requestAccounts" })
-        .then(wallets => {
-          setAccountAddress(wallets[0]);
-          console.log("Logged with metamask, wallet: " + accountAddress);
-        }
-        );
-    } else {
-      console.log("Manca matamask o altri errori");
-    }
-  };
-
-  function approveXCRMRK() {
-    const offerCreationFee = 5 * 10 ** 9;
-    Promise.all([smartContractXCRMRK.approve(landBlockCA, offerCreationFee)
-    ]).then(allResponses => { console.log("Risultato 1: " + allResponses[0]) });
-  }
-
-  useEffect(() => {
-
-  }, [activeOffersNumber]);
-
-  return (
-    <div class="container-p-3 my-3 bg-dark text-white">
-      <div class='padding_20'>
-        <div class="d-flex justify-content-between align-center">
-          <div class="col">
-            <div class="row">
-              <h1>Skybreach tools - Land Block Sale</h1>
-            </div>
-            <div class="row">
-              <div class="col-sm">
-                <a href="https://superrisk-studio.gitbook.io/skybreach-land-block-sale/" class="btn btn-outline-info" role="button" aria-pressed="true">Gitbook</a>
-
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col"></div>
-            <h5>Connected wallet:</h5>
-            <div class="padding_20"><h5>{accountAddress}</h5></div>
-          </div>
-          <button type="button" class="btn btn-outline-primary" onClick={buttonWalletConnectionHandler}>Connect wallet</button>
-        </div>
-      </div>
-
-      <HandleMyOffers connected_wallet={accountAddress} />
-      <CreateOffer create_offer={0} />
-      <div class="card bg-info">
-        <div class="card-body">
-          <h3 class="card-title">Market offers</h3>
-          <div class="col d-flex justify-content-center btn-block">
-            <button type="button" class="btn btn-warning col-12" onClick={handleClick}>Get active offers</button>
-          </div>
-        </div>
-      </div>
-      <div>
-        {actualActiveOffers.map(offerId => (
-          <Block offer_id={offerId} key={offerId} />
-        ))}
-      </div>
-      <WithdrawComponent key={accountAddress} connected_account={accountAddress} />
+  function SkybreachFooter() {
+    return (
       <div class="mt-5 pt-5 pb-5 footer">
         <div class="box_container_padded">
           <div class="d-flex justify-content-end">
@@ -127,7 +104,139 @@ function App() {
           </div>
         </div>
       </div>
-    </div>
+
+    );
+  }
+
+
+  // Metamask button
+  const connectWallet = async () => {
+
+    // Check Metamask presence
+    var { ethereum } = window;
+    if (!ethereum) {
+      console.log("Metamask not installed");
+    } else {
+      console.log("Wallet found, ready to start");
+    }
+
+    try {
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' }); // fundamental to add this line for correctness
+      if (accounts.length !== 0) {
+        setCurrentAccount(accounts[0]);
+        console.log("Account 0: " + accounts[0]);
+      } else {
+        console.log("0 account connected to Metamask extension");
+      }
+    } catch {
+      console.log("Error during Metamask connection");
+    }
+
+  }
+
+
+  // CHANGE CONNECT WALLET BUTTON
+  function updateConnectedWallet() {
+
+    if (currentAccount === "") {
+      console.log("Not logged in");
+      return (
+        <MButton className="blueButton" variant="outlined" sx={{ borderRadius: 3, fontWeight: 'bold', border: '4px solid', padding: "10px 15px", maxWidth: '120px', maxHeight: '80px', minWidth: '5px', minHeight: '5px', fontSize: 'clamp(12px, 1vw, 18px)' }} onClick={connectWallet}>
+          Connect wallet
+        </MButton>
+      );
+    } else {
+      return (
+
+        <Box display="inline-flex" alignContent="center">
+          <Box sx={{ ml: 1, mr: 1 }}>
+            <Typography sx={{ color: "#4180CB", fontSize: 'clamp(22px, 1vw, 36px)' }} >
+              Connected&nbsp;wallet:
+            </Typography>
+            <Typography sx={{ color: "#4180CB", fontSize: 'clamp(22px, 1vw, 36px)' }} >
+              {currentAccount.substring(0, 5) + "..." + currentAccount.substring(currentAccount.length, currentAccount.length - 5)}
+            </Typography>
+          </Box>
+        </Box>
+      );
+    }
+  }
+
+  // VARIOUS STYLES
+  const routeLinkStyle = {
+    textDecoration: "none",
+    color: 'white',
+    fontWeight: '800',
+    fontSize: 20
+  };
+
+  const homeLinkStyle = {
+    textDecoration: "none",
+    color: 'white',
+    fontWeight: '800',
+    fontSize: 30
+  };
+
+  return (
+    <BrowserRouter>
+
+      <div className="App" class="bg" >
+
+        <Routes >
+
+          <Route exact path='/' element={
+            <Box className='fullPage' display='flex' justifyContent='center' alignItems='center' sx={{ p: 5 }}>
+              <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center' >
+                <Box sx={{ maxWidth: 200 }}>
+                  <img src={SRSlogo} alt="Superrisk Studio logo" class='img-fluid' />
+                </Box>
+                <Typography className='blueGradientText' sx={{ fontSize: 100, fontWeight: 1000 }}>
+                  SKYBREACH TOOLS
+                </Typography>
+                <Typography className='blueGradientText' sx={{ mt: -4, fontSize: 60, fontWeight: 1000 }}>
+                  Land-block Sale
+                </Typography>
+                <Box display='flex' gap={5} alignItems='center'>
+                  <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 350, height: 130, borderRadius: 50 }} onClick={connectWallet}>
+                    <Typography sx={{ color: 'white', fontWeight: '800', fontSize: 30 }}>
+                      Connect&nbsp; wallet
+                    </Typography>
+                  </Button>
+                  <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 350, height: 130, borderRadius: 50 }} disabled={currentAccount === ""}>
+                    <Link to={'/Offermarket'} style={homeLinkStyle}>
+                      Enter Market
+                    </Link>
+                  </Button>
+                </Box>
+              </Box>
+            </Box>
+          } />
+
+          <Route exact path='/Offermarket' element={
+            <div>
+              {SkybreachAppBar()}
+              <div class="mt-5 container">
+                <HandleOffers wallet={currentAccount} />
+
+              </div>
+              {SkybreachFooter()}
+            </div>
+          } />
+
+          <Route exact path='/Landmanagement' element={
+            <div>
+              {SkybreachAppBar()}
+              <div class="mt-5 container">
+                <CreateOffer create_offer={0} />
+                <WithdrawComponent key={currentAccount} connected_account={currentAccount} />
+              </div>
+              {SkybreachFooter()}
+            </div>
+          } />
+
+        </Routes>
+      </div >
+    </BrowserRouter>
   );
 
 

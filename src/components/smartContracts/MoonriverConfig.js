@@ -1,3 +1,4 @@
+import { XC_RMRK_ABI } from '../Constants';
 import LandBlockSalesABI from '../smartContracts/ABI/LandBlockSaleABI.json';
 import SkybreachLandSaleABI from '../smartContracts/ABI/SkybreachLandSaleABI.json';
 import XCRMRKPartialABI from '../smartContracts/ABI/XcRMRKPartialABI.json';
@@ -41,7 +42,7 @@ export const metamaskProvider = new ethers.providers.Web3Provider(window.ethereu
 // ---------------------------------- //
 
 // XCRMRK token
-export const xcRMRKReadable = new ethers.Contract(XCRMRK_TOKEN_ADDRESS, XCRMRK_TOKEN_ABI, moonriverProvider);
+export const xcRMRKReadable = new ethers.Contract(XC_RMRK_ABI, XCRMRK_TOKEN_ABI, moonriverProvider);
 export const xcRMRKWritable = new ethers.Contract(XCRMRK_TOKEN_ADDRESS, XCRMRK_TOKEN_ABI, metamaskProvider.getSigner());
 
 // Land Block Sale

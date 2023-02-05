@@ -13,11 +13,13 @@ import { Box, IconButton, Button, Grid } from '@mui/material';
 import LandListEntry from './minorComponents/LandListEntry';
 
 // Blockchain imports
-import { landBlockSalesReadable, LAND_BLOCK_SALES_ADDRESS, xcRMRKReadable, xcRMRKWritable } from '../components/smartContracts/MoonriverConfig';
+import { landBlockSalesReadable, landBlockSalesWritable, LAND_BLOCK_SALES_ADDRESS, xcRMRKReadable, xcRMRKWritable } from '../components/smartContracts/MoonriverConfig';
 import { ethers } from "ethers";
 import { CHUNKY_LAND_IDS, GIFT_LAND_IDS } from './minorComponents/SkybreachTempData';
 import GenericPopup from './minorComponents/GenericPopup/GenericPopup';
-import { writeLandBlockSC } from './LandBlockSale';
+import { getReadableLandsFromIds } from "../logicUtils/SkybreachUtils";
+import { REVERT_MIN_ALLOWANCE_NOT_MET, REVERT_DISPATCH } from "./errorHadling/MetamaskErrors";
+import { getPopupContent } from './errorHadling/Errors';
 
 
 const ExpandMore = styled((props) => {
@@ -58,6 +60,10 @@ function OfferCard(props) {
     // Popups & Logs
     const [popupBuyOffer, setPopupBuyOffer] = useState(false);
     const [popupApproveBuy, setPopupApproveBuy] = useState(false);
+    const [popupCancelOffer, setPopupCancelOffer] = useState(false);
+
+    const [logErrorAllowanceNotMet, setLogErrorAllowanceNotMet] = useState(false);
+    const [logErrorDispatch, setLogErrorDispatch] = useState(false);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
@@ -69,6 +75,9 @@ function OfferCard(props) {
     const closePopupApproveBuy = () => {
         setPopupApproveBuy(false);
     };
+    const closePopupCancelOffer = () => {
+        setPopupCancelOffer(false);
+    }
 
     useEffect(() => {
 
@@ -105,11 +114,23 @@ function OfferCard(props) {
         }
     });
 
-    function approveXCRMRK(offerPrice) {
-        console.log("Offer price: %f RMRK", offerPrice);
-        xcRMRKWritable.approve(LAND_BLOCK_SALES_ADDRESS, offerPrice)
+    function approveXCRMRK() {
+        console.log("Offer price: %f RMRK", blockPrice);
+        xcRMRKWritable.approve(LAND_BLOCK_SALES_ADDRESS, blockPrice)
             .then(response => {
                 console.log(response);
+                xcRMRKReadable.on("Approval", (_owner, _spender, _value) => {
+                    let eventInfo = {
+                        owner: _owner,
+                        spender: _spender,
+                        value: _value
+                    };
+                    if (eventInfo['value'] > 0) {
+                        console.log("Asset Market Smart contract authorized!");
+                    } else {
+                        console.log("Something went wrong, try again the authorization process");
+                    }
+                });
             }).catch(error => {
                 console.log("Error approving XCRMRK");
                 console.log(error);
@@ -119,14 +140,30 @@ function OfferCard(props) {
     }
 
     function buyLandBlock() {
-        writeLandBlockSC.buyLandBlock(currentOfferId)
+        landBlockSalesWritable.buyLandBlock(currentOfferId)
             .then(buyResponseResult => {
                 console.log("buyResponseResult: " + buyResponseResult);
             })
             .catch(buyError => {
-                console.log("Buy error: " + buyError);
+                if ((buyError['data']['message']).indexOf(REVERT_MIN_ALLOWANCE_NOT_MET) !== -1) {
+                    setLogErrorAllowanceNotMet("You need to approve the purchase first.");
+                } else if ((buyError['data']['message']).indexOf(REVERT_DISPATCH) !== -1) {
+                    setLogErrorDispatch("Error buying the block. Maybe you don't own enough tokens?");
+                }
+                console.log("BUY ERROR");
+                console.log("Buy error: " + buyError['data']['message']);
             });
         setPopupBuyOffer(false);
+    }
+
+    function cancelOffer() {
+        landBlockSalesWritable.cancelOffer(currentOfferId)
+        .then(cancelResponse => {
+            console.log("cancelResponse: " + cancelResponse);
+        }).catch(error => {
+            console.log(error['data']['message']);
+        });
+        setPopupCancelOffer(false);
     }
 
 
@@ -161,8 +198,8 @@ function OfferCard(props) {
                         handleOpen={popupBuyOffer}
                         handleClose={closePopupBuyOffer}
                         popupType="warning"
-                        popupMessage={"Confirm that you want to deposit the "}
-                        popupButtonMessage="Confirm declaration"
+                        popupMessage={"Confirm that you want to purchase the land block for " + (parseFloat(blockPrice) / (10 ** 10)) + " RMRK, made by the following lands: \n" + getReadableLandsFromIds(landIdsInOffer)}
+                        popupButtonMessage="Buy lands block"
                         popupButtonAction={buyLandBlock} />
                     :
                     <></>
@@ -178,6 +215,20 @@ function OfferCard(props) {
                     :
                     <></>
                 }
+                {popupCancelOffer ?
+                    <GenericPopup
+                        handleOpen={popupCancelOffer}
+                        handleClose={closePopupCancelOffer}
+                        popupType="warning"
+                        popupMessage={"Confirm that you want to cancel your offer with id "  + currentOfferId + " that contains " + landIdsInOffer.length}
+                        popupButtonMessage="Cancel"
+                        popupButtonAction={cancelOffer} />
+                    :
+                    <></>
+                }
+
+                {logErrorAllowanceNotMet ? getPopupContent("error", logErrorAllowanceNotMet, setLogErrorAllowanceNotMet) : <></>}
+                {logErrorDispatch ? getPopupContent("error", logErrorDispatch, setLogErrorDispatch) : <></>}
 
                 <Collapse in={expanded} timeout="auto" >
                     {
@@ -226,9 +277,9 @@ function OfferCard(props) {
                             {getPresenceIcon(hasAdjacencyBonus)}
                         </Box>
                     </Box>
-                    {userWallet === offerMaker ?
+                    {userWallet !== offerMaker ?
                         <Box display='flex' justifyContent='flex-end'>
-                            <Button className='discardButton' variant='outlined' sx={{ mt: 2, fontWeight: 'bold', color: 'red', width: 100, borderRadius: 2 }}>
+                            <Button onClick={setPopupCancelOffer} className='discardButton' variant='outlined' sx={{ mt: 2, fontWeight: 'bold', color: 'red', width: 100, borderRadius: 2 }}>
                                 Cancel
                             </Button>
                         </Box> :
@@ -243,7 +294,7 @@ function OfferCard(props) {
 
                             <Grid item xs='auto'>
                                 <Button onClick={setPopupBuyOffer} className='yellowButton' variant='contained' size='small' sx={{ fontWeight: 'bold', color: '#282c34', width: 100 }}>
-                                    Buy
+                                    BUY BLOCK
                                 </Button>
                             </Grid>
                         </Grid>

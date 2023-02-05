@@ -1,7 +1,6 @@
-import { XC_RMRK_ABI } from '../Constants';
+import XC_RMRK_ABI from '../smartContracts/ABI/XC_RMRK_ABI.json';
 import LandBlockSalesABI from '../smartContracts/ABI/LandBlockSaleABI.json';
 import SkybreachLandSaleABI from '../smartContracts/ABI/SkybreachLandSaleABI.json';
-import XCRMRKPartialABI from '../smartContracts/ABI/XcRMRKPartialABI.json';
 
 // Polygon smart contract addresses
 export const XCRMRK_TOKEN_ADDRESS = "0xffffffFF893264794d9d57E1E0E21E0042aF5A0A";
@@ -10,7 +9,7 @@ export const SKYBREACH_LAND_SALES_ADDRESS = "0x913a3E067a559Ba24A7a06a6CDEa4837E
 
 
 // Smart Contract ABIs
-const XCRMRK_TOKEN_ABI = XCRMRKPartialABI;
+const XCRMRK_TOKEN_ABI = XC_RMRK_ABI;
 const LAND_BLOCK_SALES_ABI = LandBlockSalesABI;
 const SKYBREACH_LAND_SALES_ABI = SkybreachLandSaleABI;
 

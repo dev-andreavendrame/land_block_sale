@@ -18,7 +18,7 @@ import { ethers } from "ethers";
 import { CHUNKY_LAND_IDS, GIFT_LAND_IDS } from './minorComponents/SkybreachTempData';
 import GenericPopup from './minorComponents/GenericPopup/GenericPopup';
 import { getReadableLandsFromIds } from "../logicUtils/SkybreachUtils";
-import { REVERT_MIN_ALLOWANCE_NOT_MET, REVERT_DISPATCH } from "./errorHadling/MetamaskErrors";
+import { REVERT_MIN_ALLOWANCE_NOT_MET, REVERT_DISPATCH, REVERT_OFFER_NOT_OWNED } from "./errorHadling/MetamaskErrors";
 import { getPopupContent } from './errorHadling/Errors';
 
 
@@ -64,6 +64,7 @@ function OfferCard(props) {
 
     const [logErrorAllowanceNotMet, setLogErrorAllowanceNotMet] = useState(false);
     const [logErrorDispatch, setLogErrorDispatch] = useState(false);
+    const [logErrorOfferNotOwned, setLogErrorOfferNotOwned] = useState(false);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
@@ -158,11 +159,14 @@ function OfferCard(props) {
 
     function cancelOffer() {
         landBlockSalesWritable.cancelOffer(currentOfferId)
-        .then(cancelResponse => {
-            console.log("cancelResponse: " + cancelResponse);
-        }).catch(error => {
-            console.log(error['data']['message']);
-        });
+            .then(cancelResponse => {
+                console.log("cancelResponse: " + cancelResponse);
+            }).catch(error => {
+                if ((error['data']['message']).indexOf(REVERT_OFFER_NOT_OWNED) !== -1) {
+                    setLogErrorOfferNotOwned("You don't own this offer!");
+                }
+                console.log(error['data']['message']);
+            });
         setPopupCancelOffer(false);
     }
 
@@ -220,7 +224,7 @@ function OfferCard(props) {
                         handleOpen={popupCancelOffer}
                         handleClose={closePopupCancelOffer}
                         popupType="warning"
-                        popupMessage={"Confirm that you want to cancel your offer with id "  + currentOfferId + " that contains " + landIdsInOffer.length}
+                        popupMessage={"Confirm that you want to cancel your offer with id " + currentOfferId + " that contains " + landIdsInOffer.length}
                         popupButtonMessage="Cancel"
                         popupButtonAction={cancelOffer} />
                     :
@@ -229,6 +233,8 @@ function OfferCard(props) {
 
                 {logErrorAllowanceNotMet ? getPopupContent("error", logErrorAllowanceNotMet, setLogErrorAllowanceNotMet) : <></>}
                 {logErrorDispatch ? getPopupContent("error", logErrorDispatch, setLogErrorDispatch) : <></>}
+                {logErrorOfferNotOwned ? getPopupContent("error", logErrorOfferNotOwned, setLogErrorOfferNotOwned) : <></>}
+
 
                 <Collapse in={expanded} timeout="auto" >
                     {

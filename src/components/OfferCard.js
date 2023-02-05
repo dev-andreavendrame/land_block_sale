@@ -283,7 +283,7 @@ function OfferCard(props) {
                             {getPresenceIcon(hasAdjacencyBonus)}
                         </Box>
                     </Box>
-                    {userWallet !== offerMaker ?
+                    {userWallet === offerMaker ?
                         <Box display='flex' justifyContent='flex-end'>
                             <Button onClick={setPopupCancelOffer} className='discardButton' variant='outlined' sx={{ mt: 2, fontWeight: 'bold', color: 'red', width: 100, borderRadius: 2 }}>
                                 Cancel

@@ -1,7 +1,7 @@
 // React imports
 import { React, useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
-import { Box } from '@mui/material';
+import { Box, IconButton, SvgIcon } from '@mui/material';
 
 // Subsquid imports
 import { subsquidClient } from '../../index';
@@ -13,6 +13,7 @@ import { getImageByRarity } from './LandUtils';
 
 import img_gift_box from '../images/gift-with_border.png';
 import img_othala_chunky from '../images/othalachunky-with-border.png';
+import MyLocationTwoToneIcon from '@mui/icons-material/MyLocationTwoTone';
 
 function LandListEntry(props) {
 
@@ -23,6 +24,7 @@ function LandListEntry(props) {
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     // Land details
     const [plotRarity, setPlotRarity] = useState(-1);
+    let x, y;
 
     function loadLandDetailsFromSubsquid(landId) {
         // Get data from Subsquid
@@ -72,12 +74,27 @@ function LandListEntry(props) {
 
     }, [landRetrievedDetails])
 
+    function getFormattedLandId(landId) {
+        y = Math.floor(landId / 256);
+        x = landId % 256;
+        return "(" + x + "," + y + ") ";
+    }
+
+    function getLandLink() {
+        return ("https://skybreach.app/map?jumpTo=" + x + "," + y)
+    }
 
     return (
         <Box display='flex' justifyContent='space-between' alignItems='center' sx={{ p: 1, backgroundColor: getColorByRarity(plotRarity) }}>
-            <Typography variant='body2' color='white'>
-                {getFormattedLandId(landId)}
-            </Typography>
+            <Box display='flex' alignItems='center' gap={1}>
+                <Typography variant='body2' color='white'>
+                    {getFormattedLandId(landId)}
+                </Typography>
+                <a href={getLandLink()} class="iconLink">
+                    <MyLocationTwoToneIcon />
+                </a>
+            </Box>
+
             <Typography variant='body2' color='white'>
                 {getRarityByConstants(plotRarity)}
             </Typography>
@@ -102,13 +119,6 @@ function getGiftBoxIcon(isPresent) {
     if (isPresent) {
         return (<img width="30" height="30" alt='gift box icon' src={img_gift_box} />);
     }
-}
-
-
-function getFormattedLandId(landId) {
-    const y = Math.floor(landId / 256);
-    const x = landId % 256;
-    return "(" + x + "," + y + ") ";
 }
 
 function getRarityByConstants(rarityValue) {

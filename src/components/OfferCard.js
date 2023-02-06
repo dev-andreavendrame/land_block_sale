@@ -183,8 +183,8 @@ function OfferCard(props) {
                 <Typography paragraph>
                     <Box fontWeight='fontWeightMedium' display='inline'> Total lands contained:</Box> {landIdsInOffer.length}
                 </Typography>
-                <Box display='inline-flex' alignItems='center'>
-                    <Typography variant='body2' color="text.secondary" >
+                <Box display='inline-flex' alignItems='center' gap={1} sx={{ mb: 1 }}>
+                    <Typography variant='body2' className='blueGradientText' sx={{ fontWeight: 800, fontSize: 18 }} >
                         Lands list:
                     </Typography>
                     <ExpandMore
@@ -192,8 +192,10 @@ function OfferCard(props) {
                         onClick={handleExpandClick}
                         aria-expanded={expanded}
                         aria-label="show more"
+                        className='blueGradientIcon'
+                        sx={{ width: 30, height: 30 }}
                     >
-                        <ExpandMoreIcon />
+                        <ExpandMoreIcon sx={{ color: 'white' }}/>
                     </ExpandMore>
                 </Box>
 

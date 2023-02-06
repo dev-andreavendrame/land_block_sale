@@ -220,6 +220,34 @@
   border: 1px red;
 }
 
+
+.iconLink {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 26px;
+  color: #fff;
+  border-radius: 50%;
+  outline: solid 2px #fff;
+  outline-offset: -8px;
+  transition-property: outline-offset, outline-color, background-color;
+  transition-duration: .25s;
+}
+
+.iconLink:hover {
+  animation: spin .4s ease-out;
+  color: #fff;
+  outline-offset: 0px;
+  background-image: radial-gradient(circle at 50% 50%, #86E5FF, #209de0) !important;
+}
+
+@keyframes spin {
+  100%{transform: rotate(90deg)}
+}
+
 /*
 
   /-------------------------/

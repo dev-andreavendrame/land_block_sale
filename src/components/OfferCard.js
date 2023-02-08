@@ -37,7 +37,7 @@ function OfferCard(props) {
 
     // Parent passed values
     const currentOfferId = props.id;
-    const userWallet = props.userWallet;
+    const isMine = props.isMine;
 
     // Component state variables
     const [offerDetails, setOfferDetails] = useState(null);
@@ -173,7 +173,7 @@ function OfferCard(props) {
     return (
         <Card sx={{ mb: 3, maxWidth: 345, borderRadius: 3, boxShadow: 24, }}>
             <CardHeader className='blueGradient'
-                title={"Offer ID: " + props.id} />
+                title={"Offer: " + props.id} />
 
             <CardContent className='lightGreyGradient'>
                 <Typography paragraph>
@@ -284,7 +284,7 @@ function OfferCard(props) {
                             {getPresenceIcon(hasAdjacencyBonus)}
                         </Box>
                     </Box>
-                    {userWallet === offerMaker ?
+                    {isMine ?
                         <Box display='flex' justifyContent='flex-end'>
                             <Button onClick={setPopupCancelOffer} className='discardButton' variant='outlined' sx={{ mt: 2, fontWeight: 'bold', color: 'red', width: 100, borderRadius: 2 }}>
                                 Cancel

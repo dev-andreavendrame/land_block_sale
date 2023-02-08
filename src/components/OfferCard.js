@@ -96,7 +96,6 @@ function OfferCard(props) {
                         setServiceFee(offerDetails['serviceFee']);
                         setOfferTimestamp(offerDetails['timestamp']);
                         setOfferMaker(offerDetails['offerMaker']);
-                        hadAdjacencyBonus()
                         setHasAdjacencyBonus(hasIt(landIdsInOffer));
 
                         // Get info about Othala Chunkies and Gift Boxes presence

@@ -8,7 +8,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client
 
 export const subsquidClient = new ApolloClient({
   cache: new InMemoryCache(),
-  uri: "https://squid.subsquid.io/skybreach-landsale-analytics/v/v16/graphql",
+  uri: "https://squid.subsquid.io/skybreach-landsale-analytics/v/v17/graphql",
 })
 
 // Test query

@@ -90,7 +90,7 @@ function LandListEntry(props) {
                 <Typography variant='body2' color='white'>
                     {getFormattedLandId(landId)}
                 </Typography>
-                <a href={getLandLink()} class="iconLink">
+                <a href={getLandLink()} target="_blank" class="iconLink">
                     <MyLocationTwoToneIcon />
                 </a>
             </Box>

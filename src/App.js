@@ -9,6 +9,7 @@ import CreateOffer from './components/CreateOffer';
 import WithdrawComponent from './components/WithdrawComponent';
 
 import SRSlogo from './components/images/SRS_logo.png';
+import SkybreachIsland from './components/images/skybreach_island.jpg';
 
 // New imports
 
@@ -36,7 +37,7 @@ function App() {
             </Box>
             <Box >
               <Typography sx={{ ml: 2, fontWeight: 'bold', fontSize: 'clamp(26px, 4vw, 40px)', textAlign: 'left' }} variant='h4' >
-                Skybreach tools
+                Superrisk tools
               </Typography>
               <Typography sx={{ ml: 2, mb: 3, fontWeight: 'normal', fontSize: 'clamp(18px, 4vw, 30px)', textAlign: 'left' }} variant='h5'>
                 Land Block Sale
@@ -74,10 +75,10 @@ function App() {
         <div class="box_container_padded">
           <div class="d-flex justify-content-end">
             <div class="wrapper">
-              <h2>Skybreach tools - Land Block Sale
+              <h2>Superrisk tools - Land Block Sale
               </h2>
               <div class="padding_20">
-                <p class="pr-5 text-white-50">Skybreach tools - Land Block Sale (also shortened LBS) is a free dApp that has the aim to add a new feature by giving to the project users the possibility to sell Skybreach metaverse lands in block directly on-chain and without trust a third human part.</p>
+                <p class="pr-5 text-white-50">Superrisk tools - Land Block Sale (also shortened LBS) is a free dApp that has the aim to add a new feature by giving to the project users the possibility to sell Skybreach metaverse lands in block directly on-chain and without trust a third human part.</p>
               </div>
             </div>
             <div class="col-lg-3 col-xs-12 links">
@@ -185,13 +186,13 @@ function App() {
         <Routes >
 
           <Route exact path='/' element={
-            <Box className='fullPage' display='flex' justifyContent='center' alignItems='center' sx={{ p: 5 }}>
-              <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center' >
+            <Box className='fullPage bg-homeImage' display='flex' justifyContent='center' alignItems='center' sx={{ p: 5 }} style={{ backgroundImage: `url(${SkybreachIsland})` }}>
+              <Box className="whiteHomeBackground" display='flex' flexDirection='column' justifyContent='center' alignItems='center' sx={{ p: 3 }} >
                 <Box sx={{ maxWidth: 200 }}>
                   <img src={SRSlogo} alt="Superrisk Studio logo" class='img-fluid' />
                 </Box>
-                <Typography className='blueGradientText' sx={{ fontSize: 100, fontWeight: 1000 }}>
-                  SKYBREACH TOOLS
+                <Typography className='blueGradientText textThinShadow' sx={{ fontSize: 100, fontWeight: 1000 }}>
+                  SUPERRISK TOOLS
                 </Typography>
                 <Typography className='blueGradientText' sx={{ mt: -4, fontSize: 60, fontWeight: 1000 }}>
                   Land-block Sale

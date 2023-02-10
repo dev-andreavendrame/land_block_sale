@@ -171,7 +171,7 @@ function OfferCard(props) {
 
 
     return (
-        <Card sx={{ mb: 3, maxWidth: 345, borderRadius: 3, boxShadow: 24, }}>
+        <Card sx={{ mb: 3, maxWidth: 345, borderRadius: 3, boxShadow: 8, }}>
             <CardHeader className='blueGradient'
                 title={"Offer: " + props.id} />
 

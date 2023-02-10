@@ -32,6 +32,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -71,30 +72,38 @@
   background: #000000;
   color: white;
 }
+
 .footer .links ul {
   list-style-type: none;
 }
+
 .footer .links li a {
   color: white;
   transition: color 0.2s;
 }
+
 .footer .links li a:hover {
   text-decoration: none;
   color: #4180CB;
 }
+
 .footer .about-company i {
   font-size: 25px;
 }
+
 .footer .about-company a {
   color: white;
   transition: color 0.2s;
 }
+
 .footer .about-company a:hover {
   color: #4180CB;
 }
+
 .footer .location i {
   font-size: 18px;
 }
+
 .footer .copyright p {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -118,7 +127,13 @@
   width: 100px;
 }
 
+html {
+  height: 100vh;
+}
 
+body {
+  height: 100vh;
+}
 
 
 
@@ -132,10 +147,12 @@
 .redWhiteButton {
   color: #fff !important;
 }
+
 .redWhiteButton:hover {
   background-color: #940000 !important;
   border: 0px solid !important;
 }
+
 .redWhiteButton:disabled {
   background-color: #b6b6b6 !important;
   color: #8d8d8d !important;
@@ -143,19 +160,22 @@
   border-color: #8d8d8d !important;
 }
 
-.yellowButton  {
+.yellowButton {
   background-image: linear-gradient(to top, #f0b624, #ffdb80) !important;
 }
+
 .yellowButton:hover {
   filter: brightness(90%);
 }
+
 .yellowButton:disabled {
   filter: grayscale();
 }
 
-.redButton  {
+.redButton {
   background-image: linear-gradient(to top, red, #ff8080) !important;
 }
+
 .redButton:hover {
   filter: brightness(85%);
 }
@@ -182,13 +202,16 @@
   background-image: linear-gradient(to top, #209de0, #86E5FF) !important;
   transition: all .2s ease-in-out !important;
 }
+
 .blueGradientButton:hover {
   transform: scale(1.1);
 }
+
 .blueGradientButton--navigation:hover {
   filter: drop-shadow(0px 0px 20px black);
   filter: brightness(85%);
 }
+
 .blueGradientButton:disabled {
   filter: grayscale();
 }
@@ -196,27 +219,31 @@
 .discardButton {
   border: 2px solid red !important;
 }
+
 .discardButton:hover {
   background-color: red !important;
   color: white !important;
 }
+
 .discardButton:active {
   background-color: rgb(155, 0, 0) !important;
-  border-color:rgb(155, 0, 0) !important;
+  border-color: rgb(155, 0, 0) !important;
 }
 
 
 .fullPage {
-  height: 100%;
+  height: 100vh !important;
 }
+
 .partialPage {
-  height: 80%;
+  height: 80vh;
 }
 
 
 .validInput {
   border: 1px green;
 }
+
 .invalidInput {
   border: 1px red;
 }
@@ -246,12 +273,37 @@
 }
 
 @keyframes spin {
-  100%{transform: rotate(90deg)}
+  100% {
+    transform: rotate(90deg)
+  }
 }
 
 .blueGradientIcon {
   background-image: linear-gradient(to top, #209de0, #86E5FF) !important;
 }
+
+
+.roundImage {
+  width: 800px;
+  height: 800px;
+  background-color: #940000;
+  border-radius: 48%;
+  position: absolute;
+  transform: translate(-90%, 40%);
+}
+
+.bg-homeImage {
+  background-size: cover;
+  background-position-y: bottom;
+}
+
+.whiteHomeBackground {
+  border-radius: 150px;
+  background-image: radial-gradient(closest-corner at center, white, white, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2));
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+}
+
 
 /*
 

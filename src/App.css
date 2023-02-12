@@ -200,16 +200,18 @@ body {
 
 .blueGradientButton {
   background-image: linear-gradient(to top, #209de0, #86E5FF) !important;
-  transition: all .2s ease-in-out !important;
+  transition: all .1s !important;
 }
 
-.blueGradientButton:hover {
+.blueGradientButton--icon:hover {
   transform: scale(1.1);
+  filter: brightness(110%) !important;
 }
 
 .blueGradientButton--navigation:hover {
-  filter: drop-shadow(0px 0px 20px black);
-  filter: brightness(85%);
+  transform: scale(0.95);
+  filter: brightness(110%) !important;
+  box-shadow: 0px 0px 20px 0px #209de0 !important;
 }
 
 .blueGradientButton:disabled {
@@ -298,7 +300,7 @@ body {
 }
 
 .whiteHomeBackground {
-  border-radius: 150px;
+  border-radius: 130px;
   background-image: radial-gradient(closest-corner at center, white, white, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2));
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);

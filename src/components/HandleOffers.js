@@ -60,7 +60,7 @@ function HandleOffers(props) {
                     <Typography className='blueGradientText' sx={{ mr: 5, fontSize: 60, fontWeight: 1000 }}>
                         Active Market Offers
                     </Typography>
-                    <IconButton className='blueGradientButton' variant='contained' size='large' onClick={loadActiveOffers} sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
+                    <IconButton className='blueGradientButton blueGradientButton--icon' variant='contained' size='large' onClick={loadActiveOffers} sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
                         <RefreshIcon sx={{ color: 'white' }} />
                     </IconButton>
                 </Box>
@@ -80,7 +80,7 @@ function HandleOffers(props) {
                     <Typography className='blueGradientText' sx={{ mr: 5, fontSize: 60, fontWeight: 1000 }}>
                         My Offers
                     </Typography>
-                    <IconButton className='blueGradientButton' onClick={loadActiveOffers} variant='contained' size='large' sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
+                    <IconButton className='blueGradientButton blueGradientButton--icon' onClick={loadActiveOffers} variant='contained' size='large' sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
                         <RefreshIcon sx={{ color: 'white' }} />
                     </IconButton>
                 </Box>
@@ -103,21 +103,3 @@ function HandleOffers(props) {
 
 } export default HandleOffers;
 
-
-// MY OFFERS section, to add in the future under the map of MARKET OFFERS
-/*
-                <Box display='flex' alignItems='center' sx={{ mt: 5 }}>
-                    <Typography className='blueGradientText' sx={{ mr: 5, fontSize: 60, fontWeight: 1000 }}>
-                        My Offers
-                    </Typography>
-                    {myButton ?
-                        <IconButton className='blueGradientButton' variant='contained' size='large' sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
-                            <RefreshIcon sx={{ color: 'white' }} />
-                        </IconButton>
-                        :
-                        <Button className='blueGradientButton' variant='contained' size='large' sx={{ maxWidth: 120, maxHeight: 60, borderRadius: 10, fontWeight: 600 }}>
-                            Check
-                        </Button>
-                    }
-                </Box>
-*/

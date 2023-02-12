@@ -1,7 +1,7 @@
 // React imports
 import { React, useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
-import { Box, IconButton, SvgIcon } from '@mui/material';
+import { Box } from '@mui/material';
 
 // Subsquid imports
 import { subsquidClient } from '../../index';
@@ -90,7 +90,7 @@ function LandListEntry(props) {
                 <Typography variant='body2' color='white'>
                     {getFormattedLandId(landId)}
                 </Typography>
-                <a href={getLandLink()} target="_blank" class="iconLink">
+                <a href={getLandLink()} target="_blank" rel="noreferrer" class="iconLink">
                     <MyLocationTwoToneIcon />
                 </a>
             </Box>

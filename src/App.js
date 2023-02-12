@@ -191,11 +191,11 @@ function App() {
                 <Box sx={{ maxWidth: 200 }}>
                   <img src={SRSlogo} alt="Superrisk Studio logo" class='img-fluid' />
                 </Box>
-                <Typography className='blueGradientText textThinShadow' sx={{ fontSize: 100, fontWeight: 1000 }}>
-                  SUPERRISK TOOLS
+                <Typography className='blueGradientText textThinShadow' sx={{ fontSize: 72, fontWeight: 1000 }}>
+                  SUPERRISK STUDIO
                 </Typography>
-                <Typography className='blueGradientText' sx={{ mt: -4, fontSize: 60, fontWeight: 1000 }}>
-                  Land-block Sale
+                <Typography className='blueGradientText' sx={{ mt: -4, fontSize: 36, fontWeight: 1000 }}>
+                  Land Block Sale
                 </Typography>
                 <Box display='flex' gap={5} alignItems='center'>
                   <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 350, height: 130, borderRadius: 50 }} onClick={connectWallet}>

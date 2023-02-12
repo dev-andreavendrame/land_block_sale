@@ -1,13 +1,12 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Component, useEffect, useState, useRef } from 'react';
-import { readLandBlockSC, writeLandBlockSC, LAND_BLOCK_ABI, landBlockCA } from './LandBlockSale';
+import { useEffect, useState } from 'react';
+import { readLandBlockSC } from './LandBlockSale';
 import SingleLand from './SingleLand';
 
 function WithdrawComponent(props) {
 
     // Withdraw info
     const [depositedLands, setDepositedLands] = useState([]);
-    const [selectedLands, setSelectedLands] = useState([]);
     const [testo, setTesto] = useState("");
 
     useEffect(() => {

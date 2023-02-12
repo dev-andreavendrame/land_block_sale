@@ -1,6 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 
 import { Box, AppBar, Typography, Button } from '@mui/material';
 import MButton from '@mui/material/Button';
@@ -17,12 +17,12 @@ import HandleOffers from './components/HandleOffers';
 
 //added react router for more pages
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { DAPP_NAME, MADE_BY } from './components/minorComponents/Constants';
 
 function App() {
 
   // Account state
   const [currentAccount, setCurrentAccount] = useState("");
-  var activeOffersNumber = useRef(-1);
 
   // Appbar 
   function SkybreachAppBar() {
@@ -37,10 +37,10 @@ function App() {
             </Box>
             <Box >
               <Typography sx={{ ml: 2, fontWeight: 'bold', fontSize: 'clamp(26px, 4vw, 40px)', textAlign: 'left' }} variant='h4' >
-                Superrisk tools
+                {DAPP_NAME}
               </Typography>
               <Typography sx={{ ml: 2, mb: 3, fontWeight: 'normal', fontSize: 'clamp(18px, 4vw, 30px)', textAlign: 'left' }} variant='h5'>
-                Land Block Sale
+                {MADE_BY}
               </Typography>
             </Box>
             <Box sx={{ ml: 5, mb: 2 }}>
@@ -75,10 +75,10 @@ function App() {
         <div class="box_container_padded">
           <div class="d-flex justify-content-end">
             <div class="wrapper">
-              <h2>Superrisk tools - Land Block Sale
+              <h2>{DAPP_NAME + ", " +  MADE_BY}
               </h2>
               <div class="padding_20">
-                <p class="pr-5 text-white-50">Superrisk tools - Land Block Sale (also shortened LBS) is a free dApp that has the aim to add a new feature by giving to the project users the possibility to sell Skybreach metaverse lands in block directly on-chain and without trust a third human part.</p>
+                <p class="pr-5 text-white-50">{DAPP_NAME} (also shortened LBS) is a free dApp made {MADE_BY} that has the aim to add a new feature by giving to the project users the possibility to sell Skybreach metaverse lands in block directly on-chain and without trust any third human part.</p>
               </div>
             </div>
             <div class="col-lg-3 col-xs-12 links">
@@ -192,10 +192,10 @@ function App() {
                   <img src={SRSlogo} alt="Superrisk Studio logo" class='img-fluid' />
                 </Box>
                 <Typography className='blueGradientText textThinShadow' sx={{ fontSize: 72, fontWeight: 1000 }}>
-                  SUPERRISK STUDIO
+                  {DAPP_NAME.toUpperCase()}
                 </Typography>
                 <Typography className='blueGradientText' sx={{ mt: -4, fontSize: 36, fontWeight: 1000 }}>
-                  Land Block Sale
+                  {MADE_BY}
                 </Typography>
                 <Box display='flex' gap={5} alignItems='center'>
                   <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 350, height: 130, borderRadius: 50 }} onClick={connectWallet}>

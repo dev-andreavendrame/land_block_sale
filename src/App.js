@@ -36,10 +36,10 @@ function App() {
               <img src={SRSlogo} alt="SRS logo" class="img-fluid" />
             </Box>
             <Box >
-              <Typography sx={{ ml: 2, fontWeight: 'bold', fontSize: 'clamp(26px, 4vw, 40px)', textAlign: 'left' }} variant='h4' >
+              <Typography sx={{ ml: 2, fontWeight: 'bold', fontSize: 'clamp(2rem, 4vw, 2.5rem)', textAlign: 'left' }} variant='h4' noWrap>
                 {DAPP_NAME}
               </Typography>
-              <Typography sx={{ ml: 2, mb: 3, fontWeight: 'normal', fontSize: 'clamp(18px, 4vw, 30px)', textAlign: 'left' }} variant='h5'>
+              <Typography sx={{ ml: 2, mb: 3, fontWeight: 'normal', fontSize: 'clamp(1rem, 2vw, 2rem)', textAlign: 'left' }} variant='h5' noWrap>
                 {MADE_BY}
               </Typography>
             </Box>
@@ -51,12 +51,12 @@ function App() {
           <Box sx={{ minWidth: 50 }} />
 
           <Box display="inline-flex" gap={3} sx={{ mr: 5, mb: 2, alignItems: "center", justifyContent: "flex-end", minHeight: 10 }}>
-            <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ width: 200, maxHeight: 100, borderRadius: 10 }}>
+            <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ width: 160, maxHeight: 80, borderRadius: 4 }}>
               <Link to={'/Landmanagement'} style={routeLinkStyle}>
                 Land Management
               </Link>
             </Button>
-            <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ width: 200, maxHeight: 100, borderRadius: 10 }}>
+            <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ width: 160, maxHeight: 80, borderRadius: 4 }}>
               <Link to={'/Offermarket'} style={routeLinkStyle}>
                 Offer
                 <br />
@@ -168,14 +168,14 @@ function App() {
     textDecoration: "none",
     color: 'white',
     fontWeight: '800',
-    fontSize: 20
+    fontSize: 16
   };
 
   const homeLinkStyle = {
     textDecoration: "none",
     color: 'white',
     fontWeight: '800',
-    fontSize: 30
+    fontSize: 22
   };
 
   return (
@@ -187,23 +187,23 @@ function App() {
 
           <Route exact path='/' element={
             <Box className='fullPage bg-homeImage' display='flex' justifyContent='center' alignItems='center' sx={{ p: 5 }} style={{ backgroundImage: `url(${SkybreachIsland})` }}>
-              <Box className="whiteHomeBackground" display='flex' flexDirection='column' justifyContent='center' alignItems='center' sx={{ p: 3 }} >
-                <Box sx={{ maxWidth: 200 }}>
+              <Box className="whiteHomeBackground" display='flex' flexDirection='column' justifyContent='center' alignItems='center' sx={{ p: 5, pr: 10, pl: 10 }} >
+                <Box sx={{ mb: 2, maxWidth: 180 }}>
                   <img src={SRSlogo} alt="Superrisk Studio logo" class='img-fluid' />
                 </Box>
-                <Typography className='blueGradientText textThinShadow' sx={{ fontSize: 72, fontWeight: 1000 }}>
+                <Typography className='blueGradientText textThinShadow' sx={{ wordSpacing: '10px' , fontSize: 72, fontWeight: 1000 }}>
                   {DAPP_NAME.toUpperCase()}
                 </Typography>
-                <Typography className='blueGradientText' sx={{ mt: -4, fontSize: 36, fontWeight: 1000 }}>
+                <Typography className='blueGradientText' sx={{ mt: -2, fontSize: 36, fontWeight: 1000 }}>
                   {MADE_BY}
                 </Typography>
-                <Box display='flex' gap={5} alignItems='center'>
-                  <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 350, height: 130, borderRadius: 50 }} onClick={connectWallet}>
-                    <Typography sx={{ color: 'white', fontWeight: '800', fontSize: 30 }}>
+                <Box display='flex' gap={10} alignItems='center'>
+                  <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 200, height: 100, borderRadius: 4 }} onClick={connectWallet}>
+                    <Typography sx={{ color: 'white', fontWeight: '800', fontSize: 22 }}>
                       Connect&nbsp; wallet
                     </Typography>
                   </Button>
-                  <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 350, height: 130, borderRadius: 50 }} disabled={currentAccount === ""}>
+                  <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 200, height: 100, borderRadius: 4 }} disabled={currentAccount === ""}>
                     <Link to={'/Offermarket'} style={homeLinkStyle}>
                       Enter Market
                     </Link>

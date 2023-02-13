@@ -17,7 +17,7 @@ import HandleOffers from './components/HandleOffers';
 
 //added react router for more pages
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { DAPP_NAME, MADE_BY } from './components/minorComponents/Constants';
+import { DAPP_NAME, MADE_BY, DAPP_VERSION } from './components/minorComponents/Constants';
 
 function App() {
 
@@ -36,9 +36,14 @@ function App() {
               <img src={SRSlogo} alt="SRS logo" class="img-fluid" />
             </Box>
             <Box >
-              <Typography sx={{ ml: 2, fontWeight: 'bold', fontSize: 'clamp(2rem, 4vw, 2.5rem)', textAlign: 'left' }} variant='h4' noWrap>
-                {DAPP_NAME}
-              </Typography>
+              <Box display='flex' flexDirection='row' alignItems='flex-end' >
+                <Typography sx={{ ml: 2, fontWeight: 'bold', fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', textAlign: 'left' }} variant='h4' noWrap>
+                  {DAPP_NAME}
+                </Typography>
+                <Typography sx={{ mb: 0.6, ml: 1, fontWeight: 300, fontSize: 'clamp(1rem, 2vw, 1.3rem)', textAlign: 'left' }} variant='h4' noWrap>
+                  v{DAPP_VERSION}
+                </Typography>
+              </Box>
               <Typography sx={{ ml: 2, mb: 3, fontWeight: 'normal', fontSize: 'clamp(1rem, 2vw, 2rem)', textAlign: 'left' }} variant='h5' noWrap>
                 {MADE_BY}
               </Typography>
@@ -75,7 +80,7 @@ function App() {
         <div class="box_container_padded">
           <div class="d-flex justify-content-end">
             <div class="wrapper">
-              <h2>{DAPP_NAME + ", " +  MADE_BY}
+              <h2>{DAPP_NAME + ", " + MADE_BY}
               </h2>
               <div class="padding_20">
                 <p class="pr-5 text-white-50">{DAPP_NAME} (also shortened LBS) is a free dApp made {MADE_BY} that has the aim to add a new feature by giving to the project users the possibility to sell Skybreach metaverse lands in block directly on-chain and without trust any third human part.</p>
@@ -151,10 +156,10 @@ function App() {
 
         <Box display="inline-flex" alignContent="center">
           <Box sx={{ ml: 1, mr: 1 }}>
-            <Typography sx={{ color: "#4180CB", fontSize: 'clamp(22px, 1vw, 36px)' }} >
+            <Typography sx={{ color: "#4180CB", fontSize: 'clamp(1rem, 2vw, 2rem)' }} >
               Connected&nbsp;wallet:
             </Typography>
-            <Typography sx={{ color: "#4180CB", fontSize: 'clamp(22px, 1vw, 36px)' }} >
+            <Typography sx={{ color: "#4180CB", fontSize: 'clamp(1rem, 2vw, 2rem)' }} >
               {currentAccount.substring(0, 5) + "..." + currentAccount.substring(currentAccount.length, currentAccount.length - 5)}
             </Typography>
           </Box>
@@ -191,11 +196,14 @@ function App() {
                 <Box sx={{ mb: 2, maxWidth: 180 }}>
                   <img src={SRSlogo} alt="Superrisk Studio logo" class='img-fluid' />
                 </Box>
-                <Typography className='blueGradientText textThinShadow' sx={{ wordSpacing: '10px' , fontSize: 72, fontWeight: 1000 }}>
+                <Typography className='blueGradientText textThinShadow' sx={{ wordSpacing: '10px', fontSize: 72, fontWeight: 1000 }}>
                   {DAPP_NAME.toUpperCase()}
                 </Typography>
                 <Typography className='blueGradientText' sx={{ mt: -2, fontSize: 36, fontWeight: 1000 }}>
                   {MADE_BY}
+                </Typography>
+                <Typography className='blueGradientText' sx={{ mt: -1, fontSize: 18, fontWeight: 600 }}>
+                  Version: {DAPP_VERSION}
                 </Typography>
                 <Box display='flex' gap={10} alignItems='center'>
                   <Button className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ mt: 5, width: 200, height: 100, borderRadius: 4 }} onClick={connectWallet}>

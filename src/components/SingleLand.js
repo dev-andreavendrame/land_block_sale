@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { readLandBlockSC, writeLandBlockSC, LAND_BLOCK_ABI, landBlockCA } from './LandBlockSale';
+import { Box, Typography, Button } from '@mui/material';
 
 
 function SingleLand(props) {
@@ -19,20 +20,20 @@ function SingleLand(props) {
     }
 
     return (
-
-        <div class="container-p-3 my-3 bg-dark text-white padding_side_20">
-            <div class="row">
-                <div class="col-1">
-                    <h5>{"Land " + (props.number + 1) + ")"}</h5>
-                </div>
-                <div class="col-4">
-                    <h5 class="padding_side_20">{"Coordinates (" + (props.land_id % 256) + "," + Math.floor(props.land_id / 256) + ")"}</h5>
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-outline-primary" onClick={withdrawSingleLand}>Withdraw this land</button>
-                </div>
-            </div>
-        </div>
+        <Box display='flex' flexDirection='row' alignItems='center' gap={6} sx={{ p: 1 }}>
+            <Typography sx={{ fontWeight: 'bold' }}>
+                Land &nbsp;{(props.number + 1)}
+            </Typography>
+            <Typography sx={{ fontWeight: 'bold' }}>
+                Coordinates {"(" + (props.land_id % 256) + "," + Math.floor(props.land_id / 256) + ")"}
+            </Typography>
+            <Typography sx={{ fontWeight: 'bold' }}>
+                Offer: &nbsp;{props.offer ? props.offer : "none"}
+            </Typography>
+            <Button className='yellowButton' variant='contained' onClick={withdrawSingleLand} sx={{ color: 'black' }}>
+                Withdraw this land
+            </Button>
+        </Box>
     )
 
 } export default SingleLand;

@@ -9,7 +9,7 @@ function DepositedLandCard(props) {
     const [landBiomes, setLandBiomes] = useState(["loading..."]);
 
     return (
-        <Card sx={{ mb: 3, maxWidth: 270, borderRadius: 3, boxShadow: 24, }}>
+        <Card sx={{ mb: 3, maxWidth: 270, borderRadius: 3, boxShadow: 8, }}>
             <CardHeader className='blueGradient'
                 title={<Typography sx={{ fontSize: 22, fontWeight: 'bold' }}> ( {coordinates[0]} , {coordinates[1]} ) </Typography>}
                 avatar={<img src={getImageByRarity("4")} alt="land-rarity" />}>
@@ -33,7 +33,7 @@ function DepositedLandCard(props) {
             </CardContent>
 
             <CardActions className='blueGradient'>
-                <Box>
+                <Box sx={{ p: 1 }}>
                     <Typography sx={{ mr: 5 }}>
                         <Box fontWeight='fontWeightMedium' display='inline'> Gift: </Box>
                     </Typography>
